@@ -28,3 +28,15 @@ Route::post('/evaluasi-tp', [EvaluasiTpController::class, 'store'])
  
 Route::get('/evaluasi-tp/success', [EvaluasiTpController::class, 'success'])
     ->name('evaluasi-tp.success');
+
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('/cek-nip', [HomeController::class, 'cekNip'])->name('cek-nip');
+
+Route::get('/evaluasi-tp', [EvaluasiTpController::class, 'create'])->name('evaluasi-tp.create');
+Route::post('/evaluasi-tp', [EvaluasiTpController::class, 'store'])->name('evaluasi-tp.store');
+Route::get('/evaluasi-tp/success', [EvaluasiTpController::class, 'success'])->name('evaluasi-tp.success');
+
+Route::get('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'create'])->name('evaluasi-penyelenggaraan.create');
+Route::post('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'store'])->name('evaluasi-penyelenggaraan.store');
+Route::get('/evaluasi-penyelenggaraan/success', [EvaluasiPenyelenggaraanController::class, 'success'])->name('evaluasi-penyelenggaraan.success');
