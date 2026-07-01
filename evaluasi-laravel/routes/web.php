@@ -28,3 +28,12 @@ Route::post('/evaluasi-tp', [EvaluasiTpController::class, 'store'])
  
 Route::get('/evaluasi-tp/success', [EvaluasiTpController::class, 'success'])
     ->name('evaluasi-tp.success');
+
+use App\Http\Controllers\AdminController;
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [AdminController::class, 'loginForm'])->name('login');
+    Route::post('/login', [AdminController::class, 'login'])->name('login.post');
+    Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+});
