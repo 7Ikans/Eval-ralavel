@@ -351,8 +351,9 @@
                 <input type="hidden" name="id_diklat_daftar_online" value="1">
                 <input type="hidden" name="jenisdiklat" value="-">
                 <input type="hidden" name="tahun" value="{{ date('Y') }}">
-                <input type="hidden" name="nipwi" value="197001012000031001">
-                <input type="hidden" name="namawi" value="MUHAMMAD ALAZIZ, SE, MM.">
+                <input type="hidden" name="nipwi"   id="hidden_nip_wi"  value="">
+                <input type="hidden" name="namawi"  id="hidden_nama_wi" value="">
+                <input type="hidden" name="materi"  id="hidden_materi"  value="">
 
                 <div class="card-custom p-4 mt-4">
 
@@ -363,11 +364,13 @@
                             <div class="form-header-value">{{ $peserta['nama_pelatihan'] ?? '-' }}</div>
 
                             <div class="form-header-title">Materi</div>
-                            <select name="materi" id="select-materi" class="form-control" style="font-size: 14px; color: #555; padding: 8px 12px; height: auto;" required>
+                            <select id="select-materi" class="form-control" style="font-size: 14px; color: #555; padding: 8px 12px; height: auto;" required>
                                 <option value="">-- Pilih Materi --</option>
                                 @if(isset($materi))
                                 @foreach($materi as $m)
-                                <option value="{{ $m->materi }}">{{ $m->materi }}</option>
+                                {{-- value = id_materi (untuk query WI via AJAX) --}}
+                                {{-- data-nama = nama_materi (yang akan disimpan ke DB) --}}
+                                <option value="{{ $m->id_materi }}" data-nama="{{ $m->nama_materi }}">{{ $m->nama_materi }}</option>
                                 @endforeach
                                 @endif
                             </select>
@@ -504,21 +507,27 @@
             @endif
 
             $('#select-materi').change(function() {
-                var materiPilihan = $(this).val();
+                var idMateri   = $(this).val();
+                var namaMateri = $(this).find(':selected').data('nama'); // ambil nama dari data-nama
 
-                if (materiPilihan !== '') {
+                // Simpan nama materi ke hidden input (yang dikirim ke DB)
+                $('#hidden_materi').val(namaMateri);
+                $('#hidden_nama_wi').val('');
+                $('#hidden_nip_wi').val('');
+
+                if (idMateri !== '') {
                     $('#text_nama_wi').text('Mencari data...');
                     $.ajax({
                         url: "{{ route('evaluasi-tp.get-widyaiswara') }}",
                         type: "POST",
                         data: {
                             _token: "{{ csrf_token() }}",
-                            materi: materiPilihan
+                            materi: idMateri  // kirim id_materi ke controller
                         },
                         success: function(response) {
                             if (response.status === 'success') {
                                 var nama = response.data.nama_wi;
-                                var nip = response.data.nip_wi;
+                                var nip  = response.data.nip_wi;
                                 $('#text_nama_wi').text(nama);
                                 $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=random');
                                 $('#hidden_nama_wi').val(nama);
@@ -539,6 +548,7 @@
                     $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=Pilih+Materi&background=random');
                     $('#hidden_nama_wi').val('');
                     $('#hidden_nip_wi').val('');
+                    $('#hidden_materi').val('');
                 }
             });
         });
