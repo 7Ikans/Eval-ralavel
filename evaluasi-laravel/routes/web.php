@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 // PUBLIK
 // ==========================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/pelatihan', [HomeController::class, 'daftarPelatihan'])->name('pelatihan.index');
+// Route::get('/pelatihan', [HomeController::class, 'daftarPelatihan'])->name('pelatihan.index');
 Route::post('/cek-nip', [HomeController::class, 'cekNip'])->name('cek-nip');
 
 // Evaluasi Tenaga Pengajar

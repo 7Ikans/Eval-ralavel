@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Evaluasi Tenaga Pengajar</title>
+<<<<<<< HEAD
     <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
@@ -501,6 +502,7 @@
                 });
             });
 
+<<<<<<< HEAD
             @if($errors -> any() || session('error'))
             $('#cardKetentuan').hide();
             $('#wrapperForm').show();
@@ -526,8 +528,8 @@
                         },
                         success: function(response) {
                             if (response.status === 'success') {
-                                var nama = response.data.nama_wi;
-                                var nip  = response.data.nip_wi;
+                                var nama = response.data.nama;
+                                var nip  = response.data.nip;
                                 $('#text_nama_wi').text(nama);
                                 $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=random');
                                 $('#hidden_nama_wi').val(nama);
