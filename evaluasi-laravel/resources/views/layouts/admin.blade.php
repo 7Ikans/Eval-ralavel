@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +10,7 @@
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
+
 <body>
     <div class="d-flex">
         {{-- SIDEBAR --}}
@@ -24,31 +26,31 @@
             </div>
 
             <ul class="nav flex-column">
+                
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"
-                       class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                         <i class="fa fa-desktop me-2" style="width: 20px; text-align: center;"></i>
                         <span class="nav-text">Home</span>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa fa-table me-2" style="width: 20px; text-align: center;"></i>
                         <span class="nav-text">Data mulai tahun 2024</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa fa-table me-2" style="width: 20px; text-align: center;"></i>
-                        <span class="nav-text">Data mulai tahun 2022</span>
-                    </a>
+
+                <li class="xn-openable">
+                    <a href="{{ route('admin.tabel2022') }}">Data mulai tahun 2022</a>
                 </li>
 
                 <li class="sidebar-section-label">Data sebelum tahun 2022</li>
 
                 <li class="nav-item">
                     <a href="#collapseTabelEvaluasi" class="nav-link justify-content-between"
-                       data-bs-toggle="collapse" role="button">
+                        data-bs-toggle="collapse" role="button">
                         <div>
                             <i class="fa fa-list-check me-2" style="width: 20px; text-align: center;"></i>
                             <span class="nav-text">Tabel Evaluasi</span>
@@ -65,7 +67,7 @@
                             {{-- KLASIKAL — dinamis dari DB --}}
                             <li class="nav-item">
                                 <a href="#collapseKlasikal" class="nav-link collapsed justify-content-between"
-                                   data-bs-toggle="collapse" role="button">
+                                    data-bs-toggle="collapse" role="button">
                                     <div>
                                         <i class="fa-solid fa-graduation-cap me-2" style="width: 20px; text-align: center;"></i>
                                         <span class="nav-text">Pelatihan klasikal</span>
@@ -80,7 +82,7 @@
                                         @forelse($tahunKlasikal ?? [] as $tahun)
                                         <li>
                                             <a href="{{ route('admin.tabel.klasikal', ['tahun' => $tahun]) }}"
-                                               class="nav-link {{ request('tahun') == $tahun && request()->routeIs('admin.tabel.klasikal') ? 'active' : '' }}">
+                                                class="nav-link {{ request('tahun') == $tahun && request()->routeIs('admin.tabel.klasikal') ? 'active' : '' }}">
                                                 <span class="nav-text">{{ $tahun }}</span>
                                             </a>
                                         </li>
@@ -94,7 +96,7 @@
                             {{-- E-LEARNING — dinamis dari DB --}}
                             <li class="nav-item">
                                 <a href="#collapseElearning" class="nav-link collapsed justify-content-between"
-                                   data-bs-toggle="collapse" role="button">
+                                    data-bs-toggle="collapse" role="button">
                                     <div>
                                         <i class="fa-solid fa-laptop-code me-2" style="width: 20px; text-align: center;"></i>
                                         <span class="nav-text">Pelatihan e-learning</span>
@@ -109,7 +111,7 @@
                                         @forelse($tahunElearning ?? [] as $tahun)
                                         <li>
                                             <a href="{{ route('admin.tabel.elearning', ['tahun' => $tahun]) }}"
-                                               class="nav-link {{ request('tahun') == $tahun && request()->routeIs('admin.tabel.elearning') ? 'active' : '' }}">
+                                                class="nav-link {{ request('tahun') == $tahun && request()->routeIs('admin.tabel.elearning') ? 'active' : '' }}">
                                                 <span class="nav-text">{{ $tahun }}</span>
                                             </a>
                                         </li>
@@ -153,4 +155,5 @@
     <script src="{{ asset('js/admin.js') }}"></script>
     @stack('scripts')
 </body>
+
 </html>

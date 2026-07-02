@@ -35,10 +35,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [AdminController::class, 'login'])->name('login.post');
     Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-
     Route::get('/tabel-klasikal', [AdminController::class, 'tabelKlasikal'])->name('tabel.klasikal');
     Route::get('/tabel-elearning', [AdminController::class, 'tabelElearning'])->name('tabel.elearning');
+    Route::get('/tabel-2022', [AdminController::class, 'tabel2022'])->name('tabel2022'); 
 });
+
 Route::get('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'create'])->name('evaluasi-penyelenggaraan.create');
 Route::post('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'store'])->name('evaluasi-penyelenggaraan.store');
 Route::get('/evaluasi-penyelenggaraan/success', [EvaluasiPenyelenggaraanController::class, 'success'])->name('evaluasi-penyelenggaraan.success');

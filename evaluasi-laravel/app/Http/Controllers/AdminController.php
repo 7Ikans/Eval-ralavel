@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Evaluasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -74,42 +75,59 @@ class AdminController extends Controller
     }
 
     public function tabelKlasikal(Request $request)
-{
-    if (!session('admin_logged_in')) {
-        return redirect()->route('admin.login');
+    {
+        if (!session('admin_logged_in')) {
+            return redirect()->route('admin.login');
+        }
+
+        $tahun = $request->query('tahun');
+        $sidebar = $this->getTahunSidebar();
+
+        $diklat = Evaluasi::where('metode_pelatihan', 'klasikal')
+            ->where('tahun', $tahun)
+            ->orderBy('nama_diklat')
+            ->get();
+
+        return view('admin.tabel-klasikal', array_merge($sidebar, [
+            'diklat' => $diklat,
+            'tahun' => $tahun,
+        ]));
     }
 
-    $tahun = $request->query('tahun');
-    $sidebar = $this->getTahunSidebar();
+    public function tabelElearning(Request $request)
+    {
+        if (!session('admin_logged_in')) {
+            return redirect()->route('admin.login');
+        }
 
-    $diklat = Evaluasi::where('metode_pelatihan', 'klasikal')
-        ->where('tahun', $tahun)
-        ->orderBy('nama_diklat')
-        ->get();
+        $tahun = $request->query('tahun');
+        $sidebar = $this->getTahunSidebar();
 
-    return view('admin.tabel-klasikal', array_merge($sidebar, [
-        'diklat' => $diklat,
-        'tahun' => $tahun,
-    ]));
-}
+        $diklat = Evaluasi::where('metode_pelatihan', 'e-learning')
+            ->where('tahun', $tahun)
+            ->orderBy('nama_diklat')
+            ->get();
 
-public function tabelElearning(Request $request)
-{
-    if (!session('admin_logged_in')) {
-        return redirect()->route('admin.login');
+        return view('admin.tabel-elearning', array_merge($sidebar, [
+            'diklat' => $diklat,
+            'tahun' => $tahun,
+        ]));
     }
 
-    $tahun = $request->query('tahun');
-    $sidebar = $this->getTahunSidebar();
+    public function tabel2022()
+    {
+        $data_diklat = DB::table('hasilevaluasitp_2022')
+            ->select(
+                'idhasil',
+                'id_diklat_daftar_online',
+                'jenisdiklat as jenispelatihan',
+                'namadiklat as namapelatihan',
+                'tahun'
+            )
+            ->groupBy('namadiklat', 'tahun', 'idhasil', 'id_diklat_daftar_online', 'jenisdiklat')
+            ->orderBy('tahun', 'desc')
+            ->get();
 
-    $diklat = Evaluasi::where('metode_pelatihan', 'e-learning')
-        ->where('tahun', $tahun)
-        ->orderBy('nama_diklat')
-        ->get();
-
-    return view('admin.tabel-elearning', array_merge($sidebar, [
-        'diklat' => $diklat,
-        'tahun' => $tahun,
-    ]));
-}
+        return view('admin.tabel2022', compact('data_diklat'));
+    }
 }
