@@ -37,7 +37,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/tabel-klasikal', [AdminController::class, 'tabelKlasikal'])->name('tabel.klasikal');
     Route::get('/tabel-elearning', [AdminController::class, 'tabelElearning'])->name('tabel.elearning');
-    Route::get('/tabel-2022', [AdminController::class, 'tabel2022'])->name('tabel2022'); 
+    Route::get('/tabel-2022', [AdminController::class, 'tabel2022'])->name('tabel2022');
+    Route::get('/tabel-2024', [AdminController::class, 'tabel2024'])->name('tabel2024'); 
 });
 
 Route::get('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'create'])->name('evaluasi-penyelenggaraan.create');

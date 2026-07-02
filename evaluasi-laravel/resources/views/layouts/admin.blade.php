@@ -26,7 +26,7 @@
             </div>
 
             <ul class="nav flex-column">
-                
+
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"
                         class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -36,14 +36,18 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('admin.tabel2024') }}"
+                        class="nav-link {{ request()->routeIs('admin.tabel2024') ? 'active' : '' }}">
                         <i class="fa fa-table me-2" style="width: 20px; text-align: center;"></i>
                         <span class="nav-text">Data mulai tahun 2024</span>
                     </a>
                 </li>
 
-                <li class="xn-openable">
-                    <a href="{{ route('admin.tabel2022') }}">Data mulai tahun 2022</a>
+                <li class="nav-item">
+                    <a href="{{ route('admin.tabel2022') }}" class="nav-link {{ request()->routeIs('admin.tabel2022') ? 'active' : '' }}">
+                        <i class="fa fa-table me-2" style="width: 20px; text-align: center;"></i>
+                        <span class="nav-text">Data mulai tahun 2022</span>
+                    </a>
                 </li>
 
                 <li class="sidebar-section-label">Data sebelum tahun 2022</li>

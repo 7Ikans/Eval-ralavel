@@ -130,4 +130,21 @@ class AdminController extends Controller
 
         return view('admin.tabel2022', compact('data_diklat'));
     }
+
+    public function tabel2024()
+    {
+        $data_diklat = DB::table('hasilevaluasitp_2024')
+            ->select(
+                'idhasil',
+                'id_diklat_daftar_online',
+                'jenisdiklat as jenispelatihan',
+                'namadiklat as namapelatihan',
+                'tahun'
+            )
+            ->groupBy('namadiklat', 'tahun', 'idhasil', 'id_diklat_daftar_online', 'jenisdiklat') 
+            ->orderBy('tahun', 'desc')
+            ->get();
+
+        return view('admin.tabel2024', compact('data_diklat'));
+    }
 }
