@@ -342,8 +342,16 @@
                     </table>
                 </div>
                 <div class="modal-footer" style="border-top: 1px solid #eee; padding: 15px 25px; justify-content: flex-end;">
-                    <a href="#" class="btn btn-warning font-weight-bold" id="btnLanjutEvaluasi" style="background-color: #ffca28; color: #fff; border: none; padding: 10px 20px;">LANJUTKAN EVALUASI</a>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #858c93; border: none; padding: 10px 20px;">Batal</button>
+                    <form method="POST" action="{{ route('evaluasi-tp.set-session') }}" id="form-dummy-tp">
+                        @csrf
+                        <input type="hidden" name="nip_peserta" id="dummy-nip">
+                        <input type="hidden" name="nama_peserta" id="dummy-nama">
+                        <input type="hidden" name="jabatan" id="dummy-jabatan">
+                        <input type="hidden" name="instansi" id="dummy-instansi">
+                        <input type="hidden" name="nama_pelatihan" id="dummy-pelatihan">
+                        <button type="submit" class="btn btn-warning font-weight-bold" id="btnLanjutEvaluasi" style="background-color: #ffca28; color: #fff; border: none; padding: 10px 20px;">LANJUTKAN EVALUASI</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #858c93; border: none; padding: 10px 20px; margin-left: 10px;">Batal</button>
                 </div>
             </div>
         </div>
@@ -407,17 +415,24 @@
                     // Sembunyikan modal pertama
                     $('#modalNip').modal('hide');
                     
-                    // Isi dengan data dummy untuk melihat tampilan
+                    // Isi dengan data dummy untuk melihat tampilan tabel
                     $('#konfNip').text(nip);
                     $('#konfNama').text('Budi Santoso (Data Dummy)');
                     $('#konfJabatan').text('Pranata Komputer (Dummy)');
                     $('#konfInstansi').text('Instansi Test');
-                    $('#konfPelatihan').text('Pelatihan Test');
+                    $('#konfPelatihan').text('Pelatihan Teknis Bidang Kehumasan'); // Harus disamakan dengan data di tabel jadwal_alt database pakwi
                     $('#konfTahun').text('2026');
-                    
+
+                    // Isi input hidden untuk dikirim ke session
+                    $('#dummy-nip').val(nip);
+                    $('#dummy-nama').val('Budi Santoso (Data Dummy)');
+                    $('#dummy-jabatan').val('Pranata Komputer (Dummy)');
+                    $('#dummy-instansi').val('Instansi Test');
+                    $('#dummy-pelatihan').val('Pelatihan Teknis Bidang Kehumasan');
+
                     $('#teksKonfirmasi').text('Berikut adalah data Anda, jika sudah benar silakan bisa melanjutkan ke form Evaluasi Tenaga Pengajar');
                     $('#btnLanjutEvaluasi').text('LANJUTKAN EVALUASI TENAGA PENGAJAR');
-                    $('#btnLanjutEvaluasi').attr('href', "{{ route('evaluasi-tp.create') }}");
+                    // Hapus baris .attr('href') karena sekarang menggunakan <button type="submit">
                     
                     // Munculkan modal kedua
                     $('#modalKonfirmasi').modal('show');

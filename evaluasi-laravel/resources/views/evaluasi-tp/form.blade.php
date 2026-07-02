@@ -101,19 +101,19 @@
         <div class="card-custom">
             <div class="data-row">
                 <div class="data-label">NIP</div>
-                <div class="data-value">{{ session('nip_peserta', '199607192022031008') }}</div>
+                <div class="data-value">{{ $peserta['nip_peserta'] ?? '-' }}</div>
             </div>
             <div class="data-row">
                 <div class="data-label">Nama</div>
-                <div class="data-value">{{ session('nama_peserta', 'Ilham Habibullah Akbar, S.Kom') }}</div>
+                <div class="data-value">{{ $peserta['nama_peserta'] ?? '-' }}</div>
             </div>
             <div class="data-row">
                 <div class="data-label">Jabatan</div>
-                <div class="data-value">{{ session('jabatan', 'Pranata Komputer Ahli Pertama') }}</div>
+                <div class="data-value">{{ $peserta['jabatan'] ?? '-' }}</div>
             </div>
             <div class="data-row">
                 <div class="data-label">Instansi</div>
-                <div class="data-value">{{ session('instansi', 'Badan Pengembangan Sumber Daya Manusia Daerah') }}</div>
+                <div class="data-value">{{ $peserta['instansi'] ?? '-' }}</div>
             </div>
         </div>
 
@@ -145,9 +145,9 @@
             <form method="POST" action="{{ route('evaluasi-tp.store') }}">
                 @csrf
                 
-                <input type="hidden" name="nip_peserta" value="{{ session('nip_peserta', '199607192022031008') }}">
-                <input type="hidden" name="nama_peserta" value="{{ session('nama_peserta', 'Ilham Habibullah Akbar, S.Kom') }}">
-                <input type="hidden" name="namadiklat" value="{{ session('nama_diklat', 'Pelatihan Teknis Bidang Kehumasan') }}">
+                <input type="hidden" name="nip_peserta" value="{{ $peserta['nip_peserta'] ?? '' }}">
+                <input type="hidden" name="nama_peserta" value="{{ $peserta['nama_peserta'] ?? '' }}">
+                <input type="hidden" name="namadiklat" value="{{ $peserta['nama_pelatihan'] ?? '' }}">
                 <input type="hidden" name="id_diklat_daftar_online" value="1">
                 <input type="hidden" name="jenisdiklat" value="-">
                 <input type="hidden" name="tahun" value="{{ date('Y') }}">
@@ -159,27 +159,27 @@
                     <div class="row border-bottom pb-4 mb-4" style="border-color: #eee !important;">
                         <div class="col-md-6">
                             <div class="form-header-title">Nama Pelatihan</div>
-                            <div class="form-header-value">{{ session('nama_diklat', 'Pelatihan Teknis Bidang Kehumasan') }}</div>
+                            <div class="form-header-value">{{ $peserta['nama_pelatihan'] ?? '-' }}</div>
                             
                             <div class="form-header-title">Materi</div>
-                            <select name="materi" class="form-control" style="font-size: 14px; color: #555; padding: 8px 12px; height: auto;">
-                                <option value="Anti Korupsi">Anti Korupsi</option>
-                                <option value="Kebijakan Publik">Kebijakan Publik</option>
-                                <option value="Manajemen Risiko">Manajemen Risiko</option>
+                            <select name="materi" id="select-materi" class="form-control" style="font-size: 14px; color: #555; padding: 8px 12px; height: auto;" required>
+                                <option value="">-- Pilih Materi --</option>
+                                @if(isset($materi))
+                                    @foreach($materi as $m)
+                                        <option value="{{ $m->materi }}">{{ $m->materi }}</option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                         <div class="col-md-6">
                             <div class="form-header-title">Nama Pengajar / Widyaiswara</div>
                             <div class="custom-select-box">
-                                <img src="https://ui-avatars.com/api/?name=Muhammad+Alaziz&background=random" alt="Avatar">
+                                <img id="foto_wi" src="https://ui-avatars.com/api/?name=Pilih+Materi&background=random" alt="Avatar">
                                 <div>
-                                    <div style="font-weight: 600; font-size: 14px; color: #333;">MUHAMMAD ALAZIZ, SE, MM.</div>
+                                    <div id="text_nama_wi" style="font-weight: 600; font-size: 14px; color: #333;">Pilih materi di samping terlebih dahulu</div>
                                     <div style="font-size: 12px; color: #888;">Mengajar</div>
                                 </div>
-                                <i class="fas fa-caret-down ml-auto" style="color: #999;"></i>
                             </div>
-                        </div>
-                    </div>
 
                     <div class="table-responsive">
                         <table class="table-kuesioner">
@@ -280,18 +280,62 @@
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
         $(document).ready(function() {
-            // Animasi transisi Form Kuesioner
+            // 1. Animasi transisi Form Kuesioner (Menampilkan form saat tombol diklik)
             $('#btnTampilForm').click(function() {
                 $('#cardKetentuan').slideUp(300, function() {
                     $('#wrapperForm').slideDown(400);
                 });
             });
 
-            // Jika ada error validasi Laravel, langsung tampilkan form
+            // 2. Jika ada error validasi Laravel, langsung tampilkan form tanpa perlu klik tombol
             @if ($errors->any() || session('error'))
                 $('#cardKetentuan').hide();
                 $('#wrapperForm').show();
             @endif
+
+            // 3. AJAX untuk mengambil Widyaiswara otomatis saat materi dipilih
+            $('#select-materi').change(function() {
+                var materiPilihan = $(this).val();
+                
+                if(materiPilihan !== '') {
+                    $('#text_nama_wi').text('Mencari data...');
+                    $.ajax({
+                        url: "{{ route('evaluasi-tp.get-widyaiswara') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            materi: materiPilihan
+                        },
+                        success: function(response) {
+                            if(response.status === 'success') {
+                                var nama = response.data.nama_wi;
+                                var nip = response.data.nip_wi;
+                                
+                                // Update tampilan
+                                $('#text_nama_wi').text(nama);
+                                $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=random');
+                                
+                                // Update input hidden untuk disubmit ke database
+                                $('#hidden_nama_wi').val(nama);
+                                $('#hidden_nip_wi').val(nip);
+                            } else {
+                                $('#text_nama_wi').text('Data pengajar tidak ditemukan');
+                                $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=Tidak+Ditemukan&background=random');
+                                $('#hidden_nama_wi').val('');
+                                $('#hidden_nip_wi').val('');
+                            }
+                        },
+                        error: function() {
+                            $('#text_nama_wi').text('Terjadi kesalahan sistem');
+                        }
+                    });
+                } else {
+                    $('#text_nama_wi').text('Pilih materi di samping terlebih dahulu');
+                    $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=Pilih+Materi&background=random');
+                    $('#hidden_nama_wi').val('');
+                    $('#hidden_nip_wi').val('');
+                }
+            });
         });
     </script>
 </body>
