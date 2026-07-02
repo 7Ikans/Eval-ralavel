@@ -1,0 +1,121 @@
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        /* Layout Sidebar */
+        .sidebar {
+            min-height: 100vh;
+            background-color: #16191c;
+            width: 250px;
+            transition: all 0.3s ease; /* Tambahan: Animasi transisi */
+        }
+        .brand-box {
+            background-color: #0fa183;
+            padding: 12px;
+            font-size: 1.4rem;
+            font-weight: 500;
+            text-align: center;
+            height: 53px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link {
+            color: #8a9095;
+            padding: 0.7rem 1rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            text-decoration: none;
+            white-space: nowrap; /* Mencegah teks berantakan saat sidebar mengecil */
+        }
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .sidebar .nav-link.active {
+            color: #fff !important;
+            background-color: #0fa183 !important;
+        }
+        .sidebar-section-label {
+            color: #5c6267;
+            font-size: 0.85rem;
+            padding: 1.2rem 1rem 0.4rem 1rem;
+            white-space: nowrap;
+        }
+        
+        /* Pengaturan Icon Plus/Minus Collapse */
+        .collapse-icon .fa-square-minus {
+            display: none;
+        }
+        .nav-link:not(.collapsed) .collapse-icon .fa-square-plus {
+            display: none; 
+        }
+        .nav-link:not(.collapsed) .collapse-icon .fa-square-minus {
+            display: inline-block; 
+        }
+
+        /* Padding untuk Submenu Bertingkat */
+        .submenu-level-1 .nav-link {
+            padding-left: 2rem; 
+            color: #a2a7ab;
+        }
+        .submenu-level-2 .nav-link {
+            padding-left: 3.5rem;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        .submenu-level-2 .nav-link:hover {
+            color: #fff;
+        }
+
+        .sidebar.toggled {
+            width: 70px;
+        }
+        .sidebar.toggled .nav-text, 
+        .sidebar.toggled .admin-info,
+        .sidebar.toggled .sidebar-section-label,
+        .sidebar.toggled .collapse-icon {
+            display: none;
+        }
+        .sidebar.toggled .brand-box {
+            font-size: 0; 
+        }
+        .sidebar.toggled .brand-box::after {
+            content: "E"; 
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .sidebar.toggled .nav-link {
+            justify-content: center !important;
+            padding: 0.8rem 0;
+        }
+        .sidebar.toggled .nav-link i.me-2 {
+            margin-right: 0 !important; 
+            font-size: 1.1rem;
+        }
+
+        .sidebar.toggled .collapse {
+            display: none !important; 
+        }
+
+        .topbar {
+            background-color: #212429;
+            height: 53px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+        }
+        .breadcrumb-container {
+            background-color: #eef1f5;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
