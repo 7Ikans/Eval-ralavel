@@ -1,13 +1,16 @@
 <?php
-
+ 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+ 
 return new class extends Migration
 {
     public function up(): void
     {
+        // ==========================================================
+        // Tabel utama — dipakai AdminController (dashboard, sidebar, tabel)
+        // ==========================================================
         if (!Schema::hasTable('evaluasi')) {
             Schema::create('evaluasi', function (Blueprint $table) {
                 $table->increments('id');
@@ -23,12 +26,15 @@ return new class extends Migration
                 $table->integer('jmlh');
                 $table->string('metode_pelatihan', 64);
                 $table->timestamp('lastupdate')->useCurrent()->useCurrentOnUpdate();
-
+ 
                 $table->index(['jenis_diklat', 'tahun']);
                 $table->index('metode_pelatihan');
             });
         }
-
+ 
+        // ==========================================================
+        // Hasil Evaluasi Tenaga Pengajar 2024
+        // ==========================================================
         if (!Schema::hasTable('hasilevaluasitp_2024')) {
             Schema::create('hasilevaluasitp_2024', function (Blueprint $table) {
                 $table->increments('idhasil');
@@ -58,13 +64,15 @@ return new class extends Migration
                 $table->string('nip_peserta', 24);
                 $table->string('nama_peserta', 128);
                 $table->dateTime('timestamp')->nullable();
-
+ 
                 $table->index(['namadiklat', 'tahun', 'nipwi']);
                 $table->index('materi');
             });
         }
-
-
+ 
+        // ==========================================================
+        // Tabel-tabel form Evaluasi Penyelenggaraan (form.php - form7.php)
+        // ==========================================================
         if (!Schema::hasTable('relevan')) {
             Schema::create('relevan', function (Blueprint $table) {
                 $table->increments('id');
@@ -76,7 +84,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('pelayanan')) {
             Schema::create('pelayanan', function (Blueprint $table) {
                 $table->increments('id');
@@ -89,7 +97,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('pelayanan_peserta')) {
             Schema::create('pelayanan_peserta', function (Blueprint $table) {
                 $table->increments('id');
@@ -105,7 +113,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('kebersihan')) {
             Schema::create('kebersihan', function (Blueprint $table) {
                 $table->increments('id');
@@ -125,7 +133,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('keberfungsian')) {
             Schema::create('keberfungsian', function (Blueprint $table) {
                 $table->increments('id');
@@ -141,7 +149,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('ketersediaan')) {
             Schema::create('ketersediaan', function (Blueprint $table) {
                 $table->increments('id');
@@ -154,7 +162,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('perlengkapan')) {
             Schema::create('perlengkapan', function (Blueprint $table) {
                 $table->increments('id');
@@ -168,7 +176,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('konsumsi')) {
             Schema::create('konsumsi', function (Blueprint $table) {
                 $table->increments('id');
@@ -183,7 +191,7 @@ return new class extends Migration
                 $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             });
         }
-
+ 
         if (!Schema::hasTable('observasi')) {
             Schema::create('observasi', function (Blueprint $table) {
                 $table->increments('id');
@@ -200,7 +208,7 @@ return new class extends Migration
             });
         }
     }
-
+ 
     public function down(): void
     {
         Schema::dropIfExists('observasi');
