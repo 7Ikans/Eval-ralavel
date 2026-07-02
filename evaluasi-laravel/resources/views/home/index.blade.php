@@ -292,8 +292,65 @@
                 <div class="modal-footer" style="border-top: 1px solid #eee; padding: 15px 25px;">
                     <button type="button" class="btn btn-danger" id="btnCekNipPenyelenggaraan" style="background-color: #dc3545; padding: 8px 16px; font-weight: bold;">Cek NIP</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #858c93; border-color: #858c93; padding: 8px 16px;">Close</button>
-                    
-                    <a href="{{ route('evaluasi-penyelenggaraan.create') }}" class="btn btn-success d-none" id="btnLanjutPenyelenggaraan">Lanjutkan ke Form</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalKonfirmasiPenyelenggaraan" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="border-radius: 4px;">
+                <div class="modal-header" style="border-bottom: 1px solid #eee; padding: 20px 25px;">
+                    <h5 class="modal-title font-weight-bold" style="font-family: 'Montserrat', sans-serif; font-size: 18px; color: #333;">KONFIRMASI DATA PESERTA</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 25px 35px;">
+                    <p style="font-family: 'Droid Serif', serif; font-size: 16px; color: #333; line-height: 1.6; margin-bottom: 30px;">
+                        Berikut adalah data Anda, jika sudah benar silakan bisa melanjutkan ke form Evaluasi Penyelenggaraan
+                    </p>
+                    <table class="table table-borderless" style="font-family: 'Droid Serif', serif; font-size: 15px; color: #222;">
+                        <tbody>
+                            <tr>
+                                <td style="width: 30%; padding-left: 0; padding-bottom: 15px;">NIP</td>
+                                <td style="width: 70%; padding-bottom: 15px;" id="konfNipPenyelenggaraan"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 0; padding-bottom: 15px;">Nama</td>
+                                <td style="padding-bottom: 15px;" id="konfNamaPenyelenggaraan"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 0; padding-bottom: 15px;">Jabatan</td>
+                                <td style="padding-bottom: 15px;" id="konfJabatanPenyelenggaraan"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 0; padding-bottom: 15px;">Instansi</td>
+                                <td style="padding-bottom: 15px;" id="konfInstansiPenyelenggaraan"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 0; padding-bottom: 15px;">Pelatihan yang diikuti</td>
+                                <td style="padding-bottom: 15px;" id="konfPelatihanPenyelenggaraan"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 0; padding-bottom: 15px;">Tahun</td>
+                                <td style="padding-bottom: 15px;" id="konfTahunPenyelenggaraan"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #eee; padding: 15px 25px; justify-content: flex-end;">
+                    <form method="POST" action="{{ route('evaluasi-penyelenggaraan.set-session') }}" id="form-penyelenggaraan">
+                        @csrf
+                        <input type="hidden" name="nip_peserta" id="hiddenNipPenyelenggaraan">
+                        <input type="hidden" name="nama_peserta" id="hiddenNamaPenyelenggaraan">
+                        <input type="hidden" name="jabatan" id="hiddenJabatanPenyelenggaraan">
+                        <input type="hidden" name="instansi" id="hiddenInstansiPenyelenggaraan">
+                        <input type="hidden" name="nama_pelatihan" id="hiddenPelatihanPenyelenggaraan">
+                        <input type="hidden" name="tahun" id="hiddenTahunPenyelenggaraan">
+                        <button type="submit" class="btn btn-warning font-weight-bold" style="background-color: #ffca28; color: #fff; border: none; padding: 10px 20px;">LANJUTKAN EVALUASI PENYELENGGARAAN</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #858c93; border: none; padding: 10px 20px; margin-left: 10px;">Batal</button>
                 </div>
             </div>
         </div>
@@ -395,7 +452,7 @@
         // AJAX Cek NIP - Tenaga Pengajar
         $('#btnCekNip').click(function() {
             let nip = $('#inputNip').val();
-            if(!nip) { alert('Harap isi NIP!'); return; }
+            if(!nip) { $('#resultNip').html('<span class="text-danger">Harap isi NIP terlebih dahulu.</span>'); return; }
             $('#resultNip').html('<span class="text-info">Mengecek data...</span>');
             
             $.ajax({
@@ -443,7 +500,7 @@
         // AJAX Cek NIP - Penyelenggaraan
         $('#btnCekNipPenyelenggaraan').click(function() {
             let nip = $('#inputNipPenyelenggaraan').val();
-            if(!nip) { alert('Harap isi NIP!'); return; }
+            if(!nip) { $('#resultNipPenyelenggaraan').html('<span class="text-danger">Harap isi NIP terlebih dahulu.</span>'); return; }
             $('#resultNipPenyelenggaraan').html('<span class="text-info">Mengecek data...</span>');
             
             $.ajax({
@@ -452,17 +509,29 @@
                 data: { nip_peserta: nip },
                 success: function(res) {
                     if(res.ditemukan === 'yes') {
-                        $('#resultNipPenyelenggaraan').html('<span class="text-success font-weight-bold">Data ditemukan: ' + res.nama_peserta + '</span>');
-                        $('#btnLanjutPenyelenggaraan').removeClass('d-none');
-                        $('#btnCekNipPenyelenggaraan').addClass('d-none');
+                        $('#modalNipPenyelenggaraan').modal('hide');
+
+                        $('#konfNipPenyelenggaraan').text(res.nip_peserta);
+                        $('#konfNamaPenyelenggaraan').text(res.nama_peserta);
+                        $('#konfJabatanPenyelenggaraan').text(res.jabatan);
+                        $('#konfInstansiPenyelenggaraan').text(res.instansi);
+                        $('#konfPelatihanPenyelenggaraan').text(res.nama_pelatihan);
+                        $('#konfTahunPenyelenggaraan').text(res.tahun);
+
+                        $('#hiddenNipPenyelenggaraan').val(res.nip_peserta);
+                        $('#hiddenNamaPenyelenggaraan').val(res.nama_peserta);
+                        $('#hiddenJabatanPenyelenggaraan').val(res.jabatan);
+                        $('#hiddenInstansiPenyelenggaraan').val(res.instansi);
+                        $('#hiddenPelatihanPenyelenggaraan').val(res.nama_pelatihan);
+                        $('#hiddenTahunPenyelenggaraan').val(res.tahun);
+
+                        $('#modalKonfirmasiPenyelenggaraan').modal('show');
                     } else {
-                        $('#resultNipPenyelenggaraan').html('<span class="text-danger">Data NIP tidak ditemukan.</span>');
+                        $('#resultNipPenyelenggaraan').html('<span class="text-danger">Data NIP tidak ditemukan. Silakan periksa kembali NIP Anda.</span>');
                     }
                 },
                 error: function() {
-                    $('#resultNipPenyelenggaraan').html('<span class="text-warning font-weight-bold">(Localhost mode) Koneksi database eksternal gagal. Lanjut bypass.</span>');
-                    $('#btnLanjutPenyelenggaraan').removeClass('d-none');
-                    $('#btnCekNipPenyelenggaraan').addClass('d-none');
+                    $('#resultNipPenyelenggaraan').html('<span class="text-danger">Gagal terhubung ke server. Silakan coba lagi nanti.</span>');
                 }
             });
         });

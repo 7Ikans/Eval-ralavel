@@ -52,6 +52,7 @@ Route::post('/evaluasi-tp/store', [EvaluasiTpController::class, 'store'])->name(
 Route::get('/evaluasi-tp/success', [EvaluasiTpController::class, 'success'])->name('evaluasi-tp.success');
 
 // Rute Evaluasi Penyelenggaraan
+Route::post('/evaluasi-penyelenggaraan/set-session', [EvaluasiPenyelenggaraanController::class, 'setSession'])->name('evaluasi-penyelenggaraan.set-session');
 Route::get('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'create'])->name('evaluasi-penyelenggaraan.create');
 Route::post('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'store'])->name('evaluasi-penyelenggaraan.store');
 Route::get('/evaluasi-penyelenggaraan/success', [EvaluasiPenyelenggaraanController::class, 'success'])->name('evaluasi-penyelenggaraan.success');

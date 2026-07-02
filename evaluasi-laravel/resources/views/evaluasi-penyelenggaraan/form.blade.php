@@ -46,9 +46,17 @@
                     Pertanyaan bertanda bintang (<span class="wajib">*</span>) wajib diisi.
                 </div>
                 <div class="form-group">
+                    <label class="font-weight-bold">NIP Peserta</label>
+                    <input type="text" class="form-control" value="{{ $peserta['nip_peserta'] ?? '' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Nama Peserta</label>
+                    <input type="text" class="form-control" value="{{ $peserta['nama_peserta'] ?? '' }}" readonly>
+                </div>
+                <div class="form-group">
                     <label class="font-weight-bold">Nama Diklat / Pelatihan <span class="wajib">*</span></label>
                     <input type="text" name="nama_diklat" class="form-control" required
-                           value="{{ old('nama_diklat') }}">
+                           value="{{ old('nama_diklat', $peserta['nama_pelatihan'] ?? '') }}">
                 </div>
             </div>
         </div>

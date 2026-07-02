@@ -16,30 +16,48 @@ use Illuminate\Http\Request;
 class EvaluasiPenyelenggaraanController extends Controller
 {
     /**
+     * Simpan data peserta dari popup halaman depan ke session
+     */
+    public function setSession(Request $request)
+    {
+        $request->session()->put('peserta_penyelenggaraan', $request->all());
+        return redirect()->route('evaluasi-penyelenggaraan.create');
+    }
+
+    /**
      * Tampilkan form evaluasi penyelenggaraan.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('evaluasi-penyelenggaraan.form');
+        $peserta = $request->session()->get('peserta_penyelenggaraan');
+
+        if (!$peserta) {
+            return redirect()->route('home')->with('error', 'Silakan cek NIP terlebih dahulu dari halaman utama.');
+        }
+
+        return view('evaluasi-penyelenggaraan.form', compact('peserta'));
     }
 
     /**
      * Simpan data evaluasi ke 9 tabel terkait.
-     * Memakai updateOrCreate supaya 1 baris per nama diklat (sesuai pola tabel lama).
      */
     public function store(Request $request)
     {
+        $peserta = $request->session()->get('peserta_penyelenggaraan');
+
+        if (!$peserta) {
+            return redirect()->route('home')->with('error', 'Sesi Anda telah berakhir, silakan ulangi dari awal.');
+        }
+
         $validated = $request->validate([
             'nama_diklat' => 'required|string|max:100',
 
-            // Seksi pelayanan (petugas) - 4 soal
             'pelayanan.soal1' => 'required|string',
             'pelayanan.soal2' => 'required|string',
             'pelayanan.soal3' => 'required|string',
             'pelayanan.soal4' => 'required|string',
             'pelayanan.catatan' => 'nullable|string',
 
-            // Seksi pelayanan peserta - 7 soal
             'pelayanan_peserta.soal1' => 'required|string',
             'pelayanan_peserta.soal2' => 'required|string',
             'pelayanan_peserta.soal3' => 'required|string',
@@ -49,7 +67,6 @@ class EvaluasiPenyelenggaraanController extends Controller
             'pelayanan_peserta.soal7' => 'required|string',
             'pelayanan_peserta.catatan' => 'nullable|string',
 
-            // Seksi kebersihan - 9 soal + lokasi
             'kebersihan.kelas' => 'required|string',
             'kebersihan.asrama' => 'required|string',
             'kebersihan.soal1' => 'required|string',
@@ -63,7 +80,6 @@ class EvaluasiPenyelenggaraanController extends Controller
             'kebersihan.soal9' => 'required|string',
             'kebersihan.catatan' => 'nullable|string',
 
-            // Seksi keberfungsian - 7 soal
             'keberfungsian.soal1' => 'required|string',
             'keberfungsian.soal2' => 'required|string',
             'keberfungsian.soal3' => 'required|string',
@@ -73,14 +89,12 @@ class EvaluasiPenyelenggaraanController extends Controller
             'keberfungsian.soal7' => 'required|string',
             'keberfungsian.catatan' => 'nullable|string',
 
-            // Seksi ketersediaan - 4 soal
             'ketersediaan.soal1' => 'required|string',
             'ketersediaan.soal2' => 'required|string',
             'ketersediaan.soal3' => 'required|string',
             'ketersediaan.soal4' => 'required|string',
             'ketersediaan.catatan' => 'nullable|string',
 
-            // Seksi perlengkapan - 5 soal
             'perlengkapan.soal1' => 'required|string',
             'perlengkapan.soal2' => 'required|string',
             'perlengkapan.soal3' => 'required|string',
@@ -88,7 +102,6 @@ class EvaluasiPenyelenggaraanController extends Controller
             'perlengkapan.soal5' => 'required|string',
             'perlengkapan.catatan' => 'nullable|string',
 
-            // Seksi konsumsi - 5 soal + lokasi ruang
             'konsumsi.ruang' => 'required|string',
             'konsumsi.soal1' => 'required|string',
             'konsumsi.soal2' => 'required|string',
@@ -97,7 +110,6 @@ class EvaluasiPenyelenggaraanController extends Controller
             'konsumsi.soal5' => 'required|string',
             'konsumsi.catatan' => 'nullable|string',
 
-            // Seksi observasi - 7 soal (opsional, jika ada)
             'observasi.soal1' => 'nullable|string',
             'observasi.soal2' => 'nullable|string',
             'observasi.soal3' => 'nullable|string',
@@ -107,19 +119,22 @@ class EvaluasiPenyelenggaraanController extends Controller
             'observasi.soal7' => 'nullable|string',
             'observasi.catatan' => 'nullable|string',
 
-            // Seksi relevan - 3 soal
             'relevan.soal1' => 'required|string',
             'relevan.soal2' => 'required|string',
             'relevan.soal3' => 'required|string',
             'relevan.catatan' => 'nullable|string',
         ]);
 
+        $validated['nip_peserta'] = $peserta['nip_peserta'];
+        $validated['nama_peserta'] = $peserta['nama_peserta'];
+
         $namaDiklat = $validated['nama_diklat'];
 
-        // Pelayanan (petugas)
         Pelayanan::updateOrCreate(
             ['nama_diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'soal1' => $validated['pelayanan']['soal1'],
                 'soal2' => $validated['pelayanan']['soal2'],
                 'soal3' => $validated['pelayanan']['soal3'],
@@ -128,10 +143,11 @@ class EvaluasiPenyelenggaraanController extends Controller
             ]
         );
 
-        // Pelayanan peserta
         PelayananPeserta::updateOrCreate(
             ['diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'soal1' => $validated['pelayanan_peserta']['soal1'],
                 'soal2' => $validated['pelayanan_peserta']['soal2'],
                 'soal3' => $validated['pelayanan_peserta']['soal3'],
@@ -143,10 +159,11 @@ class EvaluasiPenyelenggaraanController extends Controller
             ]
         );
 
-        // Kebersihan
         Kebersihan::updateOrCreate(
             ['diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'kelas' => $validated['kebersihan']['kelas'],
                 'asrama' => $validated['kebersihan']['asrama'],
                 'soal1' => $validated['kebersihan']['soal1'],
@@ -162,10 +179,11 @@ class EvaluasiPenyelenggaraanController extends Controller
             ]
         );
 
-        // Keberfungsian
         Keberfungsian::updateOrCreate(
             ['diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'soal1' => $validated['keberfungsian']['soal1'],
                 'soal2' => $validated['keberfungsian']['soal2'],
                 'soal3' => $validated['keberfungsian']['soal3'],
@@ -177,10 +195,11 @@ class EvaluasiPenyelenggaraanController extends Controller
             ]
         );
 
-        // Ketersediaan
         Ketersediaan::updateOrCreate(
             ['diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'soal1' => $validated['ketersediaan']['soal1'],
                 'soal2' => $validated['ketersediaan']['soal2'],
                 'soal3' => $validated['ketersediaan']['soal3'],
@@ -189,10 +208,11 @@ class EvaluasiPenyelenggaraanController extends Controller
             ]
         );
 
-        // Perlengkapan
         Perlengkapan::updateOrCreate(
             ['diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'soal1' => $validated['perlengkapan']['soal1'],
                 'soal2' => $validated['perlengkapan']['soal2'],
                 'soal3' => $validated['perlengkapan']['soal3'],
@@ -202,10 +222,11 @@ class EvaluasiPenyelenggaraanController extends Controller
             ]
         );
 
-        // Konsumsi
         Konsumsi::updateOrCreate(
             ['diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'ruang' => $validated['konsumsi']['ruang'],
                 'soal1' => $validated['konsumsi']['soal1'],
                 'soal2' => $validated['konsumsi']['soal2'],
@@ -216,11 +237,12 @@ class EvaluasiPenyelenggaraanController extends Controller
             ]
         );
 
-        // Observasi (opsional, kalau diisi)
         if (!empty($validated['observasi']['soal1'])) {
             Observasi::updateOrCreate(
                 ['diklat' => $namaDiklat],
                 [
+                    'nip_peserta' => $peserta['nip_peserta'],
+                    'nama_peserta' => $peserta['nama_peserta'],
                     'soal1' => $validated['observasi']['soal1'] ?? '',
                     'soal2' => $validated['observasi']['soal2'] ?? '',
                     'soal3' => $validated['observasi']['soal3'] ?? '',
@@ -233,10 +255,11 @@ class EvaluasiPenyelenggaraanController extends Controller
             );
         }
 
-        // Relevan
         Relevan::updateOrCreate(
             ['diklat' => $namaDiklat],
             [
+                'nip_peserta' => $peserta['nip_peserta'],
+                'nama_peserta' => $peserta['nama_peserta'],
                 'soal1' => $validated['relevan']['soal1'],
                 'soal2' => $validated['relevan']['soal2'],
                 'soal3' => $validated['relevan']['soal3'],
