@@ -4,22 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Models\HasilEvaluasiTp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EvaluasiTpController extends Controller
 {
     /**
-     * Tampilkan form evaluasi tenaga pengajar.
+     * Simpan data peserta dari popup halaman depan ke session
      */
-    public function create()
+    public function setSession(Request $request)
     {
-        return view('evaluasi-tp.form');
+        // Simpan semua data request (NIP, nama, id pelatihan, dll) ke session 'peserta_tp'
+        $request->session()->put('peserta_tp', $request->all());
+        
+        // Arahkan ke form evaluasi
+        return redirect()->route('evaluasi-tp.create');
+    }
+
+    /**
+     * Tampilkan form evaluasi tenaga pengajar dengan data dinamis.
+     */
+    public function create(Request $request)
+    {
+        // 1. Ambil data session peserta
+        $peserta = $request->session()->get('peserta_tp');
+        
+        // Jika tidak ada session (akses url langsung), tendang kembali ke home
+        if (!$peserta) {
+            return redirect()->route('home')->with('error', 'Silakan cek NIP terlebih dahulu dari halaman utama.');
+        }
+
+        // 2. Ambil daftar materi dari DB pakwi berdasarkan nama pelatihan peserta
+        $materi = DB::connection('pakwi')->table('jadwal_alt')
+            ->where('namadiklat', 'like', '%' . $peserta['nama_pelatihan'] . '%') // <-- Ubah di sini
+            ->select('materi')
+            ->distinct()
+            ->get();
+
+        return view('evaluasi-tp.form', compact('peserta', 'materi'));
+    }
+
+    /**
+     * AJAX Endpoint: Ambil data Widyaiswara berdasarkan materi yang dipilih
+     */
+    public function getWidyaiswara(Request $request)
+    {
+        $materi = $request->materi;
+        $peserta = $request->session()->get('peserta_tp');
+
+        if (!$peserta) {
+            return response()->json(['status' => 'error', 'message' => 'Sesi Anda telah berakhir, silakan ulangi dari awal.']);
+        }
+
+        // 3. Query JOIN tabel jadwal_alt dan wid untuk mendapatkan data Widyaiswara
+        $wi = DB::connection('pakwi')->table('jadwal_alt')
+            ->join('wid', 'jadwal_alt.nip', '=', 'wid.nip') 
+            ->where('jadwal_alt.namadiklat', 'like', '%' . $peserta['nama_pelatihan'] . '%')
+            ->where('jadwal_alt.materi', $materi)
+            ->select('wid.nip', 'wid.nama')
+            ->first();
+
+        if ($wi) {
+            return response()->json(['status' => 'success', 'data' => $wi]);
+        }
+        
+        return response()->json(['status' => 'error', 'message' => 'Data Widyaiswara tidak ditemukan untuk materi ini.']);
     }
 
     /**
      * Simpan satu submission evaluasi TP.
-     * Catatan: berbeda dari modul penyelenggaraan, di sini setiap submit
-     * adalah baris baru (insert), karena satu peserta bisa mengevaluasi
-     * banyak WI dengan materi yang berbeda-beda.
      */
     public function store(Request $request)
     {

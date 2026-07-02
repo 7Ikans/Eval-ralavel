@@ -79,10 +79,12 @@
             margin-bottom: 0;
         }
 
+        .table-responsive {
+            padding: 0 25px;
+        }
+
         .table-kuesioner {
-            width: 100%;
-            color: #444;
-            margin-top: 20px;
+            table-layout: fixed;
         }
 
         .table-kuesioner th,
@@ -194,7 +196,7 @@
             color: #fff;
         }
 
-        /* ---- TABEL KUESIONER (Sticky Header) ---- */
+        /* ---- TABEL KUESIONER ---- */
         .table-kuesioner {
             width: 100%;
             color: #444;
@@ -208,16 +210,14 @@
             top: 0;
             z-index: 10;
             background: #fff;
-            /* Penting agar teks di belakang header tidak tembus pandang */
             box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-            /* Opsional: memberi sedikit efek bayangan */
         }
 
         .table-kuesioner th,
         .table-kuesioner td {
             border: none;
-            padding: 15px 10px;
-            vertical-align: top;
+            padding: 20px 15px;
+            vertical-align: middle;
         }
 
         .table-kuesioner thead th {
@@ -232,18 +232,23 @@
 
         /* ---- STYLING SLIDER KUESIONER ---- */
         .slider-container {
-            width: 100%;
+            width: 100% !important;
+            min-width: 100%;
+            display: block;
             padding: 10px 0;
         }
 
         .slider-kuesioner {
             -webkit-appearance: none;
-            width: 100%;
+            width: 100% !important;
+            min-width: 100% !important;
+            display: block;
             height: 8px;
             border-radius: 5px;
             background: #ffc107;
             outline: none;
             margin: 10px 0;
+            box-sizing: border-box;
         }
 
         .slider-kuesioner::-webkit-slider-thumb {
@@ -274,7 +279,14 @@
             font-size: 11px;
             color: #888;
             margin-top: 5px;
-            padding: 0 5px;
+            padding: 0 11px;
+        }
+
+        .slider-labels span {
+            display: flex;
+            justify-content: center;
+            width: 1px;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -289,19 +301,19 @@
         <div class="card-custom">
             <div class="data-row">
                 <div class="data-label">NIP</div>
-                <div class="data-value">{{ session('nip_peserta', '199607192022031008') }}</div>
+                <div class="data-value">{{ $peserta['nip_peserta'] ?? '-' }}</div>
             </div>
             <div class="data-row">
                 <div class="data-label">Nama</div>
-                <div class="data-value">{{ session('nama_peserta', 'Ilham Habibullah Akbar, S.Kom') }}</div>
+                <div class="data-value">{{ $peserta['nama_peserta'] ?? '-' }}</div>
             </div>
             <div class="data-row">
                 <div class="data-label">Jabatan</div>
-                <div class="data-value">{{ session('jabatan', 'Pranata Komputer Ahli Pertama') }}</div>
+                <div class="data-value">{{ $peserta['jabatan'] ?? '-' }}</div>
             </div>
             <div class="data-row">
                 <div class="data-label">Instansi</div>
-                <div class="data-value">{{ session('instansi', 'Badan Pengembangan Sumber Daya Manusia Daerah') }}</div>
+                <div class="data-value">{{ $peserta['instansi'] ?? '-' }}</div>
             </div>
         </div>
 
@@ -333,9 +345,9 @@
             <form method="POST" action="{{ route('evaluasi-tp.store') }}">
                 @csrf
 
-                <input type="hidden" name="nip_peserta" value="{{ session('nip_peserta', '199607192022031008') }}">
-                <input type="hidden" name="nama_peserta" value="{{ session('nama_peserta', 'Ilham Habibullah Akbar, S.Kom') }}">
-                <input type="hidden" name="namadiklat" value="{{ session('nama_diklat', 'Pelatihan Teknis Bidang Kehumasan') }}">
+                <input type="hidden" name="nip_peserta" value="{{ $peserta['nip_peserta'] ?? '' }}">
+                <input type="hidden" name="nama_peserta" value="{{ $peserta['nama_peserta'] ?? '' }}">
+                <input type="hidden" name="namadiklat" value="{{ $peserta['nama_pelatihan'] ?? '' }}">
                 <input type="hidden" name="id_diklat_daftar_online" value="1">
                 <input type="hidden" name="jenisdiklat" value="-">
                 <input type="hidden" name="tahun" value="{{ date('Y') }}">
@@ -345,110 +357,114 @@
                 <div class="card-custom p-4 mt-4">
 
                     <div class="row border-bottom pb-4 mb-4" style="border-color: #eee !important;">
+
                         <div class="col-md-6">
                             <div class="form-header-title">Nama Pelatihan</div>
-                            <div class="form-header-value">{{ session('nama_diklat', 'Pelatihan Teknis Bidang Kehumasan') }}</div>
+                            <div class="form-header-value">{{ $peserta['nama_pelatihan'] ?? '-' }}</div>
 
                             <div class="form-header-title">Materi</div>
-                            <select name="materi" class="form-control" style="font-size: 14px; color: #555; padding: 8px 12px; height: auto;">
-                                <option value="Anti Korupsi">Anti Korupsi</option>
-                                <option value="Kebijakan Publik">Kebijakan Publik</option>
-                                <option value="Manajemen Risiko">Manajemen Risiko</option>
+                            <select name="materi" id="select-materi" class="form-control" style="font-size: 14px; color: #555; padding: 8px 12px; height: auto;" required>
+                                <option value="">-- Pilih Materi --</option>
+                                @if(isset($materi))
+                                @foreach($materi as $m)
+                                <option value="{{ $m->materi }}">{{ $m->materi }}</option>
+                                @endforeach
+                                @endif
                             </select>
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-header-title">Nama Pengajar / Widyaiswara</div>
                             <div class="custom-select-box">
-                                <img src="https://ui-avatars.com/api/?name=Muhammad+Alaziz&background=random" alt="Avatar">
+                                <img id="foto_wi" src="https://ui-avatars.com/api/?name=Pilih+Materi&background=random" alt="Avatar">
                                 <div>
-                                    <div style="font-weight: 600; font-size: 14px; color: #333;">MUHAMMAD ALAZIZ, SE, MM.</div>
+                                    <div id="text_nama_wi" style="font-weight: 600; font-size: 14px; color: #333;">Pilih materi di samping terlebih dahulu</div>
                                     <div style="font-size: 12px; color: #888;">Mengajar</div>
                                 </div>
-                                <i class="fas fa-caret-down ml-auto" style="color: #999;"></i>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="table-responsive">
-                        <table class="table-kuesioner">
-                            <thead>
-                                <tr>
-                                    <th style="width: 5%;">No.</th>
-                                    <th style="width: 45%;">Pertanyaan</th>
-                                    <th class="text-center" style="width: 50%; padding-bottom: 15px;">
-                                        Penilaian
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php
-                                $unsur = [
-                                1 => 'Penguasaan materi',
-                                2 => 'Sistematika penyajian materi',
-                                3 => 'Ketepatan waktu dan kehadiran',
-                                4 => 'Penggunaan media / sarana pembelajaran (LCD, flipchart, dll)',
-                                5 => 'Penggunaan metode pembelajaran (ceramah, tanya jawab, diskusi, game, kuis, dll)',
-                                6 => 'Sikap dan perilaku saat mengajar',
-                                7 => 'Penggunaan bahasa saat mengajar',
-                                8 => 'Sikap dan perilaku saat bertanya / menjawab / merespon / memberi feedback',
-                                9 => 'Penggunaan bahasa saat bertanya / menjawab / merespon / memberi feedback',
-                                10 => 'Sikap dan perilaku saat memberi motivasi',
-                                11 => 'Penggunaan bahasa saat memberi motivasi',
-                                12 => 'Kecakapan menciptakan kondusivitas kelas',
-                                13 => 'Kecakapan menjaga situasi kelas yang dinamis',
-                                14 => 'Kerjasama antar Widyaiswara (khusus pembelajaran secara tim / team teaching)',
-                                ];
-                                @endphp
+                        <div class="table-responsive">
+                            <table class="table-kuesioner">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">No.</th>
+                                        <th style="width: 45%;">Pertanyaan</th>
+                                        <th class="text-center" style="width: 50%; padding-bottom: 15px;">
+                                            Penilaian
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                    $unsur = [
+                                    1 => 'Penguasaan materi',
+                                    2 => 'Sistematika penyajian materi',
+                                    3 => 'Ketepatan waktu dan kehadiran',
+                                    4 => 'Penggunaan media / sarana pembelajaran (LCD, flipchart, dll)',
+                                    5 => 'Penggunaan metode pembelajaran (ceramah, tanya jawab, diskusi, game, kuis, dll)',
+                                    6 => 'Sikap dan perilaku saat mengajar',
+                                    7 => 'Penggunaan bahasa saat mengajar',
+                                    8 => 'Sikap dan perilaku saat bertanya / menjawab / merespon / memberi feedback',
+                                    9 => 'Penggunaan bahasa saat bertanya / menjawab / merespon / memberi feedback',
+                                    10 => 'Sikap dan perilaku saat memberi motivasi',
+                                    11 => 'Penggunaan bahasa saat memberi motivasi',
+                                    12 => 'Kecakapan menciptakan kondusivitas kelas',
+                                    13 => 'Kecakapan menjaga situasi kelas yang dinamis',
+                                    14 => 'Kerjasama antar Widyaiswara (khusus pembelajaran secara tim / team teaching)',
+                                    ];
+                                    @endphp
 
-                                @foreach ($unsur as $no => $teks)
-                                <tr>
-                                    <td class="text-center">{{ $no }}.</td>
-                                    <td>
-                                        {{ $teks }} {!! $no != 14 ? '<span class="wajib">*</span>' : '' !!}
+                                    @foreach ($unsur as $no => $teks)
+                                    <tr>
+                                        <td class="text-center">{{ $no }}.</td>
+                                        <td>
+                                            {{ $teks }} {!! $no != 14 ? '<span class="wajib">*</span>' : '' !!}
 
-                                        @if($no == 2)
-                                        <div class="sub-question">
-                                            <ul>
-                                                <li>Pembukaan yang terdiri dari perkenalan, menyampaikan tujuan pembelajaran, dll</li>
-                                                <li>Isi</li>
-                                                <li>Penutup yang terdiri dari evaluasi dan simpulan</li>
-                                            </ul>
-                                        </div>
-                                        @endif
-                                    </td>
-
-                                    <td class="text-center align-middle">
-                                        <div class="slider-container">
-                                            <input type="range"
-                                                class="slider-kuesioner"
-                                                min="1" max="5" step="1" value="5"
-                                                data-target="hasil-{{ $no }}"
-                                                list="tickmarks-{{ $no }}"
-                                                {{ $no != 14 ? 'required' : '' }}>
-
-                                            <datalist id="tickmarks-{{ $no }}">
-                                                <option value="1"></option>
-                                                <option value="2"></option>
-                                                <option value="3"></option>
-                                                <option value="4"></option>
-                                                <option value="5"></option>
-                                            </datalist>
-
-                                            <div class="slider-labels">
-                                                <span>Tidak Baik</span>
-                                                <span>Kurang Baik</span>
-                                                <span>Cukup Baik</span>
-                                                <span>Baik</span>
-                                                <span>Sangat Baik</span>
+                                            @if($no == 2)
+                                            <div class="sub-question">
+                                                <ul>
+                                                    <li>Pembukaan yang terdiri dari perkenalan, menyampaikan tujuan pembelajaran, dll</li>
+                                                    <li>Isi</li>
+                                                    <li>Penutup yang terdiri dari evaluasi dan simpulan</li>
+                                                </ul>
                                             </div>
+                                            @endif
+                                        </td>
 
-                                            <input type="hidden" name="hasil{{ $no }}" id="hasil-{{ $no }}" value="Sangat Baik">
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                        <td class="text-center align-middle">
+                                            <div class="slider-container">
+                                                <input type="range"
+                                                    class="slider-kuesioner"
+                                                    min="1" max="5" step="1" value="5"
+                                                    data-target="hasil-{{ $no }}"
+                                                    list="tickmarks-{{ $no }}"
+                                                    {{ $no != 14 ? 'required' : '' }}>
+
+                                                <datalist id="tickmarks-{{ $no }}">
+                                                    <option value="1"></option>
+                                                    <option value="2"></option>
+                                                    <option value="3"></option>
+                                                    <option value="4"></option>
+                                                    <option value="5"></option>
+                                                </datalist>
+
+                                                <div class="slider-labels">
+                                                    <span>Tidak Baik</span>
+                                                    <span>Kurang Baik</span>
+                                                    <span>Cukup Baik</span>
+                                                    <span>Baik</span>
+                                                    <span>Sangat Baik</span>
+                                                </div>
+
+                                                <input type="hidden" name="hasil{{ $no }}" id="hasil-{{ $no }}" value="Sangat Baik">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="form-group mt-5">
@@ -464,8 +480,6 @@
                             Batalkan / Keluar
                         </a>
                     </div>
-
-                </div>
             </form>
         </div>
 
@@ -488,6 +502,45 @@
             $('#cardKetentuan').hide();
             $('#wrapperForm').show();
             @endif
+
+            $('#select-materi').change(function() {
+                var materiPilihan = $(this).val();
+
+                if (materiPilihan !== '') {
+                    $('#text_nama_wi').text('Mencari data...');
+                    $.ajax({
+                        url: "{{ route('evaluasi-tp.get-widyaiswara') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            materi: materiPilihan
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                var nama = response.data.nama_wi;
+                                var nip = response.data.nip_wi;
+                                $('#text_nama_wi').text(nama);
+                                $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=random');
+                                $('#hidden_nama_wi').val(nama);
+                                $('#hidden_nip_wi').val(nip);
+                            } else {
+                                $('#text_nama_wi').text('Data pengajar tidak ditemukan');
+                                $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=Tidak+Ditemukan&background=random');
+                                $('#hidden_nama_wi').val('');
+                                $('#hidden_nip_wi').val('');
+                            }
+                        },
+                        error: function() {
+                            $('#text_nama_wi').text('Terjadi kesalahan sistem');
+                        }
+                    });
+                } else {
+                    $('#text_nama_wi').text('Pilih materi di samping terlebih dahulu');
+                    $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=Pilih+Materi&background=random');
+                    $('#hidden_nama_wi').val('');
+                    $('#hidden_nip_wi').val('');
+                }
+            });
         });
 
         const mapNilai = {
