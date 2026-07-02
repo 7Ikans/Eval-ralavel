@@ -8,160 +8,201 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('diklat', function (Blueprint $table) {
-            $table->id();
-            $table->string('status', 50)->nullable();
-        });
+        if (!Schema::hasTable('evaluasi')) {
+            Schema::create('evaluasi', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('jenis_diklat', 50);
+                $table->string('nama_diklat', 255);
+                $table->year('tahun')->nullable();
+                $table->char('link_selenggara', 100);
+                $table->string('link_widya', 100);
+                $table->string('link_pasca', 30);
+                $table->integer('status_selenggara');
+                $table->integer('status_widya');
+                $table->integer('status_pasca');
+                $table->integer('jmlh');
+                $table->string('metode_pelatihan', 64);
+                $table->timestamp('lastupdate')->useCurrent()->useCurrentOnUpdate();
 
-        Schema::create('data_pesertas', function (Blueprint $table) {
-            $table->id();
-            $table->string('nip', 50)->nullable();
-            $table->string('nama', 200)->nullable();
-            $table->string('jns_diklat', 100)->nullable();
-            $table->date('tgl_mulai')->nullable();
-        });
+                $table->index(['jenis_diklat', 'tahun']);
+                $table->index('metode_pelatihan');
+            });
+        }
 
-        Schema::create('hasilevaluasitp_2024', function (Blueprint $table) {
-            $table->id('idhasil');
-            $table->integer('id_diklat_daftar_online')->nullable();
-            $table->string('jenisdiklat', 128)->nullable();
-            $table->string('namadiklat', 255)->nullable();
-            $table->integer('tahun')->nullable();
-            $table->string('nipwi', 48)->nullable();
-            $table->string('namawi', 128)->nullable();
-            $table->string('materi', 255)->nullable();
-            $table->string('hasil1', 50)->nullable();
-            $table->string('hasil2', 50)->nullable();
-            $table->string('hasil3', 50)->nullable();
-            $table->string('hasil4', 50)->nullable();
-            $table->string('hasil5', 50)->nullable();
-            $table->string('hasil6', 50)->nullable();
-            $table->string('hasil7', 50)->nullable();
-            $table->string('hasil8', 50)->nullable();
-            $table->string('hasil9', 50)->nullable();
-            $table->string('hasil10', 50)->nullable();
-            $table->string('hasil11', 50)->nullable();
-            $table->string('hasil12', 50)->nullable();
-            $table->string('hasil13', 50)->nullable();
-            $table->string('hasil14', 50)->nullable();
-            $table->text('saran')->nullable();
-            $table->string('nip_peserta', 24)->nullable();
-            $table->string('nama_peserta', 128)->nullable();
-            $table->dateTime('timestamp')->nullable();
-        });
+        if (!Schema::hasTable('hasilevaluasitp_2024')) {
+            Schema::create('hasilevaluasitp_2024', function (Blueprint $table) {
+                $table->increments('idhasil');
+                $table->integer('id_diklat_daftar_online');
+                $table->string('jenisdiklat', 128)->nullable();
+                $table->string('namadiklat', 255);
+                $table->year('tahun');
+                $table->string('nipwi', 48);
+                $table->string('namawi', 128);
+                $table->string('materi', 255);
+                $table->timestamp('tglmasuk')->useCurrent();
+                $table->string('hasil1', 32)->comment('Penguasaan materi');
+                $table->string('hasil2', 32)->comment('Sistematika penyajian materi');
+                $table->string('hasil3', 32)->comment('Ketepatan waktu dan kehadiran');
+                $table->string('hasil4', 32)->comment('Penggunaan media / sarana pembelajaran');
+                $table->string('hasil5', 32)->comment('Penggunaan metode pembelajaran');
+                $table->string('hasil6', 32)->comment('Sikap dan perilaku saat mengajar');
+                $table->string('hasil7', 32)->comment('Penggunaan bahasa saat mengajar');
+                $table->string('hasil8', 32)->comment('Sikap dan perilaku saat bertanya/menjawab');
+                $table->string('hasil9', 32)->comment('Penggunaan bahasa saat bertanya/menjawab');
+                $table->string('hasil10', 32)->comment('Sikap dan perilaku saat memberi motivasi');
+                $table->string('hasil11', 32)->comment('Penggunaan bahasa saat memberi motivasi');
+                $table->string('hasil12', 32)->comment('Kecakapan menciptakan kondusivitas kelas');
+                $table->string('hasil13', 32)->comment('Kecakapan menjaga situasi kelas dinamis');
+                $table->string('hasil14', 32)->nullable()->comment('Kerjasama antar Widyaiswara (team teaching)');
+                $table->text('saran')->nullable();
+                $table->string('nip_peserta', 24);
+                $table->string('nama_peserta', 128);
+                $table->dateTime('timestamp')->nullable();
 
-        Schema::create('pelayanan', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_diklat', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+                $table->index(['namadiklat', 'tahun', 'nipwi']);
+                $table->index('materi');
+            });
+        }
 
-        Schema::create('pelayanan_peserta', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->string('soal5', 50)->nullable();
-            $table->string('soal6', 50)->nullable();
-            $table->string('soal7', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
 
-        Schema::create('kebersihan', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('kelas', 50)->nullable();
-            $table->string('asrama', 50)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->string('soal5', 50)->nullable();
-            $table->string('soal6', 50)->nullable();
-            $table->string('soal7', 50)->nullable();
-            $table->string('soal8', 50)->nullable();
-            $table->string('soal9', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+        if (!Schema::hasTable('relevan')) {
+            Schema::create('relevan', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('catatan', 100);
+                $table->string('diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
 
-        Schema::create('keberfungsian', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->string('soal5', 50)->nullable();
-            $table->string('soal6', 50)->nullable();
-            $table->string('soal7', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+        if (!Schema::hasTable('pelayanan')) {
+            Schema::create('pelayanan', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('catatan', 100);
+                $table->string('nama_diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
 
-        Schema::create('ketersediaan', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+        if (!Schema::hasTable('pelayanan_peserta')) {
+            Schema::create('pelayanan_peserta', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('soal5', 100);
+                $table->string('soal6', 100);
+                $table->string('soal7', 100);
+                $table->string('catatan', 100);
+                $table->string('diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
 
-        Schema::create('perlengkapan', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->string('soal5', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+        if (!Schema::hasTable('kebersihan')) {
+            Schema::create('kebersihan', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('kelas', 100);
+                $table->string('asrama', 100);
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('soal5', 100);
+                $table->string('soal6', 100);
+                $table->string('soal7', 100);
+                $table->string('soal8', 100);
+                $table->string('soal9', 100);
+                $table->string('catatan', 100);
+                $table->string('diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
 
-        Schema::create('konsumsi', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('ruang', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->string('soal5', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+        if (!Schema::hasTable('keberfungsian')) {
+            Schema::create('keberfungsian', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('soal5', 100);
+                $table->string('soal6', 100);
+                $table->string('soal7', 100);
+                $table->string('catatan', 200);
+                $table->string('diklat', 200);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
 
-        Schema::create('observasi', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->string('soal4', 50)->nullable();
-            $table->string('soal5', 50)->nullable();
-            $table->string('soal6', 50)->nullable();
-            $table->string('soal7', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+        if (!Schema::hasTable('ketersediaan')) {
+            Schema::create('ketersediaan', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('catatan', 1000);
+                $table->string('diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
 
-        Schema::create('relevan', function (Blueprint $table) {
-            $table->id();
-            $table->string('diklat', 100)->nullable();
-            $table->string('soal1', 50)->nullable();
-            $table->string('soal2', 50)->nullable();
-            $table->string('soal3', 50)->nullable();
-            $table->text('catatan')->nullable();
-        });
+        if (!Schema::hasTable('perlengkapan')) {
+            Schema::create('perlengkapan', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('soal5', 100);
+                $table->string('catatan', 1000);
+                $table->string('diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
+
+        if (!Schema::hasTable('konsumsi')) {
+            Schema::create('konsumsi', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('ruang', 100);
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('soal5', 100);
+                $table->string('catatan', 1000);
+                $table->string('diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
+
+        if (!Schema::hasTable('observasi')) {
+            Schema::create('observasi', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('soal1', 100);
+                $table->string('soal2', 100);
+                $table->string('soal3', 100);
+                $table->string('soal4', 100);
+                $table->string('soal5', 100);
+                $table->string('soal6', 100);
+                $table->string('soal7', 100);
+                $table->string('catatan', 1000);
+                $table->string('diklat', 100);
+                $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('relevan');
         Schema::dropIfExists('observasi');
         Schema::dropIfExists('konsumsi');
         Schema::dropIfExists('perlengkapan');
@@ -170,8 +211,8 @@ return new class extends Migration
         Schema::dropIfExists('kebersihan');
         Schema::dropIfExists('pelayanan_peserta');
         Schema::dropIfExists('pelayanan');
+        Schema::dropIfExists('relevan');
         Schema::dropIfExists('hasilevaluasitp_2024');
-        Schema::dropIfExists('data_pesertas');
-        Schema::dropIfExists('diklat');
+        Schema::dropIfExists('evaluasi');
     }
 };
