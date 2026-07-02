@@ -461,38 +461,38 @@
                 data: { nip_peserta: nip },
                 success: function(res) {
                     if(res.ditemukan === 'yes') {
-                        $('#resultNip').html('<span class="text-success font-weight-bold">Data ditemukan: ' + res.nama_peserta + '</span>');
-                        $('#btnLanjutTP').removeClass('d-none');
-                        $('#btnCekNip').addClass('d-none');
+                        // 1. Sembunyikan modal NIP awal
+                        $('#modalNip').modal('hide');
+                        
+                        // 2. Isi modal konfirmasi dengan data ASLI dari database (dari response Controller)
+                        $('#konfNip').text(res.nip_peserta);
+                        $('#konfNama').text(res.nama_peserta);
+                        $('#konfJabatan').text(res.jabatan);
+                        $('#konfInstansi').text(res.instansi);
+                        $('#konfPelatihan').text(res.nama_pelatihan);
+                        $('#konfTahun').text(res.tahun);
+                        
+                        // 3. Isi input hidden form session agar dikirim ke form evaluasi
+                        $('#dummy-nip').val(res.nip_peserta);
+                        $('#dummy-nama').val(res.nama_peserta);
+                        $('#dummy-jabatan').val(res.jabatan);
+                        $('#dummy-instansi').val(res.instansi);
+                        $('#dummy-pelatihan').val(res.nama_pelatihan);
+                        
+                        $('#teksKonfirmasi').text('Berikut adalah data Anda, jika sudah benar silakan bisa melanjutkan ke form Evaluasi Tenaga Pengajar');
+                        $('#btnLanjutEvaluasi').text('LANJUTKAN EVALUASI TENAGA PENGAJAR');
+                        
+                        // 4. Munculkan modal konfirmasi
+                        $('#modalKonfirmasi').modal('show');
+                        
+                        // Reset pesan loading
+                        $('#resultNip').html('');
                     } else {
-                        $('#resultNip').html('<span class="text-danger">Data NIP tidak ditemukan.</span>');
+                        $('#resultNip').html('<span class="text-danger">Data NIP tidak ditemukan di database.</span>');
                     }
                 },
                 error: function() {
-                    // Sembunyikan modal pertama
-                    $('#modalNip').modal('hide');
-                    
-                    // Isi dengan data dummy untuk melihat tampilan tabel
-                    $('#konfNip').text(nip);
-                    $('#konfNama').text('Budi Santoso (Data Dummy)');
-                    $('#konfJabatan').text('Pranata Komputer (Dummy)');
-                    $('#konfInstansi').text('Instansi Test');
-                    $('#konfPelatihan').text('Pelatihan Teknis Bidang Kehumasan'); // Harus disamakan dengan data di tabel jadwal_alt database pakwi
-                    $('#konfTahun').text('2026');
-
-                    // Isi input hidden untuk dikirim ke session
-                    $('#dummy-nip').val(nip);
-                    $('#dummy-nama').val('Budi Santoso (Data Dummy)');
-                    $('#dummy-jabatan').val('Pranata Komputer (Dummy)');
-                    $('#dummy-instansi').val('Instansi Test');
-                    $('#dummy-pelatihan').val('Pelatihan Teknis Bidang Kehumasan');
-
-                    $('#teksKonfirmasi').text('Berikut adalah data Anda, jika sudah benar silakan bisa melanjutkan ke form Evaluasi Tenaga Pengajar');
-                    $('#btnLanjutEvaluasi').text('LANJUTKAN EVALUASI TENAGA PENGAJAR');
-                    // Hapus baris .attr('href') karena sekarang menggunakan <button type="submit">
-                    
-                    // Munculkan modal kedua
-                    $('#modalKonfirmasi').modal('show');
+                    $('#resultNip').html('<span class="text-danger">Terjadi kesalahan koneksi sistem.</span>');
                 }
             });
         });
