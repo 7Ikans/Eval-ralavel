@@ -27,6 +27,8 @@ Route::post('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::cla
     ->name('evaluasi-penyelenggaraan.store');
 Route::get('/evaluasi-penyelenggaraan/success', [EvaluasiPenyelenggaraanController::class, 'success'])
     ->name('evaluasi-penyelenggaraan.success');
+Route::post('/evaluasi-penyelenggaraan/set-session', [EvaluasiPenyelenggaraanController::class, 'setSession'])
+    ->name('evaluasi-penyelenggaraan.set-session');
 
 // ==========================
 // ADMIN
