@@ -379,10 +379,12 @@
                         <div class="col-md-6">
                             <div class="form-header-title">Nama Pengajar / Widyaiswara</div>
                             <div class="custom-select-box">
-                                <img id="foto_wi" src="https://ui-avatars.com/api/?name=Pilih+Materi&background=random" alt="Avatar">
-                                <div>
-                                    <div id="text_nama_wi" style="font-weight: 600; font-size: 14px; color: #333;">Pilih materi di samping terlebih dahulu</div>
-                                    <div style="font-size: 12px; color: #888;">Mengajar</div>
+                                <img id="foto_wi" src="https://ui-avatars.com/api/?name=Pilih+Pengajar&background=random" alt="Avatar">
+                                <div style="flex-grow: 1;">
+                                    <select id="select-widyaiswara" class="form-control" style="font-size: 14px; color: #333; padding: 6px 10px; height: auto; border: 1px solid #ccc; font-weight: 600;" required>
+                                        <option value="">-- Pilih Materi Terlebih Dahulu --</option>
+                                    </select>
+                                    <div style="font-size: 12px; color: #888; margin-top: 4px; padding-left: 4px;">Mengajar</div>
                                 </div>
                             </div>
                         </div>
@@ -492,6 +494,7 @@
     </div>
 
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/popper/popper.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
         $(document).ready(function() {
@@ -506,50 +509,81 @@
             $('#wrapperForm').show();
             @endif
 
+            // 1. AJAX saat Materi dipilih
             $('#select-materi').change(function() {
                 var idMateri   = $(this).val();
-                var namaMateri = $(this).find(':selected').data('nama'); // ambil nama dari data-nama
+                var namaMateri = $(this).find(':selected').data('nama'); 
 
-                // Simpan nama materi ke hidden input (yang dikirim ke DB)
                 $('#hidden_materi').val(namaMateri);
                 $('#hidden_nama_wi').val('');
                 $('#hidden_nip_wi').val('');
+                
+                var $selectWi = $('#select-widyaiswara');
+                
+                // Kosongkan dropdown pengajar dan beri teks loading
+                $selectWi.empty().append('<option value="">-- Mencari data... --</option>');
 
                 if (idMateri !== '') {
-                    $('#text_nama_wi').text('Mencari data...');
                     $.ajax({
                         url: "{{ route('evaluasi-tp.get-widyaiswara') }}",
                         type: "POST",
                         data: {
                             _token: "{{ csrf_token() }}",
-                            materi: idMateri  // kirim id_materi ke controller
+                            materi: idMateri
                         },
                         success: function(response) {
-                            if (response.status === 'success') {
-                                var nama = response.data.nama_wi;
-                                var nip  = response.data.nip_wi;
-                                $('#text_nama_wi').text(nama);
-                                $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=random');
-                                $('#hidden_nama_wi').val(nama);
-                                $('#hidden_nip_wi').val(nip);
+                            if (response.status === 'success' && response.data.length > 0) {
+                                // Kosongkan kembali lalu isi dengan daftar pengajar
+                                $selectWi.empty().append('<option value="">-- Pilih Pengajar --</option>');
+                                
+                                // Looping data array pengajar dari controller
+                                $.each(response.data, function(index, wi) {
+                                    $selectWi.append('<option value="' + wi.nip_wi + '" data-nama="' + wi.nama_wi + '">' + wi.nama_wi + '</option>');
+                                });
                             } else {
-                                $('#text_nama_wi').text('Data pengajar tidak ditemukan');
-                                $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=Tidak+Ditemukan&background=random');
-                                $('#hidden_nama_wi').val('');
-                                $('#hidden_nip_wi').val('');
+                                $selectWi.empty().append('<option value="">-- Data pengajar tidak ditemukan --</option>');
                             }
                         },
                         error: function() {
-                            $('#text_nama_wi').text('Terjadi kesalahan sistem');
+                            $selectWi.empty().append('<option value="">-- Terjadi kesalahan sistem --</option>');
                         }
                     });
                 } else {
-                    $('#text_nama_wi').text('Pilih materi di samping terlebih dahulu');
-                    $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=Pilih+Materi&background=random');
-                    $('#hidden_nama_wi').val('');
-                    $('#hidden_nip_wi').val('');
-                    $('#hidden_materi').val('');
+                    $selectWi.empty().append('<option value="">-- Pilih Materi Terlebih Dahulu --</option>');
                 }
+            });
+
+            // 2. Logika saat Pengajar dipilih dari dropdown
+            $('#select-widyaiswara').change(function() {
+                var nipWi = $(this).val();
+                var $selected = $(this).find(':selected');
+                var namaWi = $selected.data('nama');
+                var fotoWi = $selected.data('foto');
+                
+                var $fotoImg = $('#foto_wi');
+                
+                if(namaWi) {
+                    if (fotoWi && fotoWi !== '') {
+                        // Jika ada nama file di database, coba load gambarnya
+                        var imageUrl = '{{ asset("img/foto_wi/") }}/' + fotoWi;
+                        
+                        // Hapus handler error lama, pasang yang baru
+                        $fotoImg.off('error').on('error', function() {
+                            // Jika gambar fisik tidak ada di folder, ganti jadi inisial
+                            $(this).attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(namaWi) + '&background=random');
+                        }).attr('src', imageUrl);
+                        
+                    } else {
+                        // Jika tidak ada data foto di database, langsung pakai inisial
+                        $fotoImg.off('error').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(namaWi) + '&background=random');
+                    }
+                } else {
+                    $fotoImg.off('error').attr('src', 'https://ui-avatars.com/api/?name=Pilih+Pengajar&background=random');
+                }
+                
+                // Simpan ke input hidden agar ikut tersubmit ke database
+                $('#hidden_nip_wi').val(nipWi);
+                $('#hidden_nama_wi').val(namaWi);
             });
         });
 

@@ -51,34 +51,33 @@ class EvaluasiTpController extends Controller
      */
     public function getWidyaiswara(Request $request)
     {
-        $idMateri = $request->materi; // ini sekarang berisi id_materi (angka)
-        $peserta  = $request->session()->get('peserta_tp');
+        $materi = $request->materi;
+        $peserta = $request->session()->get('peserta_tp');
 
         if (!$peserta) {
-            return response()->json(['status' => 'error', 'message' => 'Sesi Anda telah berakhir, silakan ulangi dari awal.']);
+            return response()->json(['status' => 'error', 'message' => 'Sesi berakhir.']);
         }
 
-        // Query jadwal_alt dengan materi = idspesialisasi
-        $jadwal = DB::connection('pakwi')
-            ->table('jadwal_alt')
+        // 1. Cari NIP pengajar
+        $nips = DB::connection('pakwi')->table('jadwal_alt')
             ->where('namadiklat', 'like', '%' . $peserta['nama_pelatihan'] . '%')
-            ->where('materi', $idMateri)
-            ->select('nip')
-            ->first();
+            ->where('materi', $materi)
+            ->pluck('nip');
 
-        if ($jadwal && $jadwal->nip) {
-            $wi = DB::connection('pakwi')
-                ->table('wid')
-                ->where('nip', $jadwal->nip)
-                ->select('nip as nip_wi', 'nama as nama_wi', 'pp as foto')
-                ->first();
+        // 2. Cari nama di tabel wid DAN foto di tabel wid_pp
+        if ($nips->isNotEmpty()) {
+            $wis = DB::connection('pakwi')->table('wid')
+                ->whereIn('wid.nip', $nips)
+                ->leftJoin('wid_pp', 'wid.nip', '=', 'wid_pp.nip') // <-- Join dengan tabel foto
+                ->select('wid.nip as nip_wi', 'wid.nama as nama_wi', 'wid_pp.pp as foto_wi') // <-- Ambil kolom pp
+                ->get();
 
-            if ($wi) {
-                return response()->json(['status' => 'success', 'data' => $wi]);
+            if ($wis->isNotEmpty()) {
+                return response()->json(['status' => 'success', 'data' => $wis]);
             }
         }
-
-        return response()->json(['status' => 'error', 'message' => 'Data Widyaiswara tidak ditemukan untuk materi ini.']);
+        
+        return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan.']);
     }
 
     /**
