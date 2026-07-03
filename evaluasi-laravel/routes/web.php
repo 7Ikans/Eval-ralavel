@@ -17,7 +17,8 @@ Route::post('/cek-nip', [HomeController::class, 'cekNip'])->name('cek-nip');
 Route::get('/evaluasi-tp', [EvaluasiTpController::class, 'create'])->name('evaluasi-tp.create');
 Route::post('/evaluasi-tp', [EvaluasiTpController::class, 'store'])->name('evaluasi-tp.store');
 Route::get('/evaluasi-tp/success', [EvaluasiTpController::class, 'success'])->name('evaluasi-tp.success');
-
+Route::post('/evaluasi-tp/set-session', [EvaluasiTpController::class, 'setSession'])->name('evaluasi-tp.set-session');
+Route::post('/evaluasi-tp/get-widyaiswara', [EvaluasiTpController::class, 'getWidyaiswara'])->name('evaluasi-tp.get-widyaiswara');
 
 // Evaluasi Penyelenggaraan
 Route::get('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'create'])
