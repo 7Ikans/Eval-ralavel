@@ -40,23 +40,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/tabel-2022', [AdminController::class, 'tabel2022'])->name('tabel2022');
     Route::get('/tabel-2024', [AdminController::class, 'tabel2024'])->name('tabel2024'); 
 });
-
-Route::get('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'create'])->name('evaluasi-penyelenggaraan.create');
-Route::post('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'store'])->name('evaluasi-penyelenggaraan.store');
-Route::get('/evaluasi-penyelenggaraan/success', [EvaluasiPenyelenggaraanController::class, 'success'])->name('evaluasi-penyelenggaraan.success');
-
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::post('/cek-nip', [HomeController::class, 'cekNip'])->name('cek-nip');
-
-// Rute Evaluasi Tenaga Pengajar
-Route::post('/evaluasi-tp/set-session', [EvaluasiTpController::class, 'setSession'])->name('evaluasi-tp.set-session');
-Route::get('/evaluasi-tp', [EvaluasiTpController::class, 'create'])->name('evaluasi-tp.create');
-Route::post('/evaluasi-tp/get-widyaiswara', [EvaluasiTpController::class, 'getWidyaiswara'])->name('evaluasi-tp.get-widyaiswara');
-Route::post('/evaluasi-tp/store', [EvaluasiTpController::class, 'store'])->name('evaluasi-tp.store');
-Route::get('/evaluasi-tp/success', [EvaluasiTpController::class, 'success'])->name('evaluasi-tp.success');
-
-// Rute Evaluasi Penyelenggaraan
-Route::post('/evaluasi-penyelenggaraan/set-session', [EvaluasiPenyelenggaraanController::class, 'setSession'])->name('evaluasi-penyelenggaraan.set-session');
-Route::get('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'create'])->name('evaluasi-penyelenggaraan.create');
-Route::post('/evaluasi-penyelenggaraan', [EvaluasiPenyelenggaraanController::class, 'store'])->name('evaluasi-penyelenggaraan.store');
-Route::get('/evaluasi-penyelenggaraan/success', [EvaluasiPenyelenggaraanController::class, 'success'])->name('evaluasi-penyelenggaraan.success');

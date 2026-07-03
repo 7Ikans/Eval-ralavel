@@ -528,8 +528,8 @@
                         },
                         success: function(response) {
                             if (response.status === 'success') {
-                                var nama = response.data.nama;
-                                var nip  = response.data.nip;
+                                var nama = response.data.nama_wi;
+                                var nip  = response.data.nip_wi;
                                 $('#text_nama_wi').text(nama);
                                 $('#foto_wi').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=random');
                                 $('#hidden_nama_wi').val(nama);

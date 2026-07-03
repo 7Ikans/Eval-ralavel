@@ -28,19 +28,21 @@ class EvaluasiTpController extends Controller
             return redirect()->route('home')->with('error', 'Silakan cek NIP terlebih dahulu dari halaman utama.');
         }
 
-        // JOIN jadwal_alt dengan master_spesialisasi untuk ambil NAMA materi
-        // jadwal_alt.materi = master_spesialisasi.idspesialisasi (foreign key angka)
-        $materi = DB::connection('pakwi')
-            ->table('jadwal_alt as j')
-            ->join('master_spesialisasi as m', 'j.materi', '=', 'm.idspesialisasi')
-            ->where('j.namadiklat', 'like', '%' . $peserta['nama_pelatihan'] . '%')
-            ->select(
-                'm.idspesialisasi as id_materi',   // ID untuk query WI nanti
-                'm.spesialisasi as nama_materi'    // Nama untuk ditampilkan
-            )
-            ->distinct()
-            ->orderBy('m.spesialisasi')
-            ->get();
+        try {
+            $materi = DB::connection('pakwi')
+                ->table('jadwal_alt as j')
+                ->join('master_spesialisasi as m', 'j.materi', '=', 'm.idspesialisasi')
+                ->where('j.namadiklat', 'like', '%' . $peserta['nama_pelatihan'] . '%')
+                ->select(
+                    'm.idspesialisasi as id_materi',
+                    'm.spesialisasi as nama_materi'
+                )
+                ->distinct()
+                ->orderBy('m.spesialisasi')
+                ->get();
+        } catch (\Exception $e) {
+            $materi = collect();
+        }
 
         return view('evaluasi-tp.form', compact('peserta', 'materi'));
     }
@@ -58,20 +60,27 @@ class EvaluasiTpController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Sesi Anda telah berakhir, silakan ulangi dari awal.']);
         }
 
-        // Query jadwal_alt dengan materi = idspesialisasi
-        $jadwal = DB::connection('pakwi')
-            ->table('jadwal_alt')
-            ->where('namadiklat', 'like', '%' . $peserta['nama_pelatihan'] . '%')
-            ->where('materi', $idMateri)
-            ->select('nip')
-            ->first();
+        try {
+            $jadwal = DB::connection('pakwi')
+                ->table('jadwal_alt')
+                ->where('namadiklat', 'like', '%' . $peserta['nama_pelatihan'] . '%')
+                ->where('materi', $idMateri)
+                ->select('nip')
+                ->first();
+        } catch (\Exception $e) {
+            $jadwal = null;
+        }
 
         if ($jadwal && $jadwal->nip) {
-            $wi = DB::connection('pakwi')
-                ->table('wid')
-                ->where('nip', $jadwal->nip)
-                ->select('nip as nip_wi', 'nama as nama_wi', 'pp as foto')
-                ->first();
+            try {
+                $wi = DB::connection('pakwi')
+                    ->table('wid')
+                    ->where('nip', $jadwal->nip)
+                    ->select('nip as nip_wi', 'nama as nama_wi', 'pp as foto')
+                    ->first();
+            } catch (\Exception $e) {
+                $wi = null;
+            }
 
             if ($wi) {
                 return response()->json(['status' => 'success', 'data' => $wi]);
