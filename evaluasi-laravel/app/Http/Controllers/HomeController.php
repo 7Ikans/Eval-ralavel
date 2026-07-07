@@ -61,13 +61,7 @@ class HomeController extends Controller
         }
 
         return response()->json([
-            'ditemukan'    => 'yes',
-            'nip_peserta'  => $peserta->nip,
-            'nama_peserta' => $peserta->nama,
-            'jabatan'      => $peserta->jabatan,
-            'instansi'     => $peserta->instansi,
-            'nama_diklat'  => $peserta->nama_diklat,
-            'tahun'        => $peserta->tahun
+            'ditemukan'    => 'no'
         ]);
     }
 }

@@ -488,7 +488,7 @@
                         // Reset pesan loading
                         $('#resultNip').html('');
                     } else {
-                        $('#resultNip').html('<span class="text-danger">Data NIP tidak ditemukan di database.</span>');
+                        $('#resultNip').html('<span class="text-danger">Data NIP tidak ditemukan. Silakan periksa kembali NIP Anda.</span>');
                     }
                 },
                 error: function() {
