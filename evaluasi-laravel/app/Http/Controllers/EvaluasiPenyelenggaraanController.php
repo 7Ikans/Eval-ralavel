@@ -24,9 +24,15 @@ class EvaluasiPenyelenggaraanController extends Controller
         return redirect()->route('evaluasi-penyelenggaraan.create');
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('evaluasi-penyelenggaraan.form');
+        $peserta = $request->session()->get('data_peserta_ep');
+
+        if (!$peserta) {
+            return redirect('/')->with('error', 'Sesi Anda telah habis. Silakan masukkan NIP kembali dari halaman awal.');
+        }
+
+        return view('evaluasi-penyelenggaraan.form', compact('peserta'));
     }
 
     public function store(Request $request)
