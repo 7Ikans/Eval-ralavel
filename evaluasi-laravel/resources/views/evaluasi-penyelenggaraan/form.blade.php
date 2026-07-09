@@ -122,7 +122,7 @@
             <input type="hidden" name="instansi"       value="{{ $peserta['instansi'] ?? '' }}">
             <input type="hidden" name="nama_pelatihan" value="{{ $peserta['nama_pelatihan'] ?? '' }}">
             <input type="hidden" name="tahun"          value="{{ $peserta['tahun'] ?? date('Y') }}">
-            <input type="hidden" name="jenis_kelas"    id="hidden_jenis_kelas" value="">
+            <input type="hidden" name="jenis_kelas" id="hidden_jenis_kelas" value="">
 
             {{-- PILIH JENIS KELAS --}}
             <div class="card-custom">

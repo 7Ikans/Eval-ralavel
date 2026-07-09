@@ -453,7 +453,17 @@
                 data: { nip_peserta: nip },
                 success: function(res) {
                     if(res.ditemukan === 'yes') {
-                        dataPesertaEP = res;
+                        // Simpan semua field secara eksplisit agar tidak ada yang kosong
+                        dataPesertaEP = {
+                            nip_peserta:     res.nip_peserta,
+                            nama_peserta:    res.nama_peserta,
+                            jabatan:         res.jabatan         || '-',
+                            instansi:        res.instansi        || '-',
+                            id_pelatihan:    res.id_pelatihan    || 1,
+                            jenis_pelatihan: res.jenis_pelatihan || '-',
+                            nama_pelatihan:  res.nama_pelatihan  || '-',
+                            tahun:           res.tahun           || new Date().getFullYear()
+                        };
                         $('#resultNipPenyelenggaraan').html('<span class="text-success font-weight-bold">Data ditemukan: ' + res.nama_peserta + '</span>');
                         $('#btnLanjutPenyelenggaraan').removeClass('d-none');
                         $('#btnCekNipPenyelenggaraan').addClass('d-none');
@@ -464,10 +474,14 @@
                 error: function() {
                     // Localhost mode: data dummy
                     dataPesertaEP = {
-                        nip_peserta: nip, nama_peserta: 'Peserta (Dummy)',
-                        jabatan: '-', instansi: '-',
-                        id_pelatihan: 1, jenis_pelatihan: '-',
-                        nama_pelatihan: 'Pelatihan (Dummy)', tahun: new Date().getFullYear()
+                        nip_peserta:     nip,
+                        nama_peserta:    'Peserta (Dummy)',
+                        jabatan:         '-',
+                        instansi:        '-',
+                        id_pelatihan:    1,
+                        jenis_pelatihan: '-',
+                        nama_pelatihan:  'Pelatihan (Dummy)',
+                        tahun:           new Date().getFullYear()
                     };
                     $('#resultNipPenyelenggaraan').html('<span class="text-warning">(Localhost) Database eksternal tidak tersedia.</span>');
                     $('#btnLanjutPenyelenggaraan').removeClass('d-none');

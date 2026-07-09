@@ -42,6 +42,7 @@ class EvaluasiPenyelenggaraanController extends Controller
         $data = $request->only([
             'nip_peserta', 'nama_peserta', 'jabatan', 'instansi',
             'nama_pelatihan', 'tahun',
+            'jenis_kelas',
             // Aspek 1
             'lay_1_1','lay_1_2','lay_1_3','lay_1_4',
             'lay_1_5_1','lay_1_5_2','lay_1_5_3','lay_catatan',
