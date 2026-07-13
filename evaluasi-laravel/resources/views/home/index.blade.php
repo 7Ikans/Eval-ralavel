@@ -265,7 +265,7 @@
                     <button type="button" class="btn btn-danger" id="btnCekNip" style="background-color: #dc3545; padding: 8px 16px; font-weight: bold;">Cek NIP</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #858c93; border-color: #858c93; padding: 8px 16px;">Close</button>
                     
-                    <a href="{{ route('evaluasi-tp.create') }}" class="btn btn-success d-none" id="btnLanjutTP">Lanjutkan ke Form</a>
+                    <button type="button" class="btn btn-warning font-weight-bold d-none" id="btnLanjutTP" style="background-color: #ffca28; color: #fff; border: none; padding: 8px 16px;">LANJUTKAN EVALUASI TENAGA PENGAJAR</button>
                 </div>
             </div>
         </div>
@@ -293,7 +293,7 @@
                     <button type="button" class="btn btn-danger" id="btnCekNipPenyelenggaraan" style="background-color: #dc3545; padding: 8px 16px; font-weight: bold;">Cek NIP</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #858c93; border-color: #858c93; padding: 8px 16px;">Close</button>
                     
-                    <a href="{{ route('evaluasi-penyelenggaraan.create') }}" class="btn btn-success d-none" id="btnLanjutPenyelenggaraan">Lanjutkan ke Form</a>
+                    <button type="button" class="btn btn-warning font-weight-bold d-none" id="btnLanjutPenyelenggaraan" style="background-color: #ffca28; color: #fff; border: none; padding: 8px 16px;">LANJUTKAN EVALUASI PENYELENGGARAAN</button>
                 </div>
             </div>
         </div>
@@ -412,10 +412,28 @@
                 data: { nip_peserta: nip },
                 success: function(res) {
                     if(res.ditemukan === 'yes') {
-                        dataPesertaTP = res;
-                        $('#resultNip').html('<span class="text-success font-weight-bold">Data ditemukan: ' + res.nama_peserta + '</span>');
-                        $('#btnLanjutTP').removeClass('d-none');
-                        $('#btnCekNip').addClass('d-none');
+                        dataPesertaTP = {
+                            nip_peserta:     res.nip_peserta,
+                            nama_peserta:    res.nama_peserta,
+                            jabatan:         res.jabatan         || '-',
+                            instansi:        res.instansi        || '-',
+                            id_pelatihan:    res.id_pelatihan    || 1,
+                            jenis_pelatihan: res.jenis_pelatihan || '-',
+                            nama_pelatihan:  res.nama_pelatihan  || '-',
+                            tahun:           res.tahun           || new Date().getFullYear()
+                        };
+                        // Isi modal konfirmasi
+                        $('#konfNip').text(dataPesertaTP.nip_peserta);
+                        $('#konfNama').text(dataPesertaTP.nama_peserta);
+                        $('#konfJabatan').text(dataPesertaTP.jabatan);
+                        $('#konfInstansi').text(dataPesertaTP.instansi);
+                        $('#konfPelatihan').text(dataPesertaTP.nama_pelatihan);
+                        $('#konfTahun').text(dataPesertaTP.tahun);
+                        $('#teksKonfirmasi').text('Berikut adalah data Anda, jika sudah benar silakan bisa melanjutkan ke form Evaluasi Tenaga Pengajar');
+                        $('#btnLanjutEvaluasi').data('tipe', 'tp').text('LANJUTKAN EVALUASI TENAGA PENGAJAR');
+                        // Tutup modal NIP, buka modal konfirmasi
+                        $('#modalNip').modal('hide');
+                        $('#modalKonfirmasi').modal('show');
                     } else {
                         $('#resultNip').html('<span class="text-danger">Data NIP tidak ditemukan.</span>');
                     }
@@ -464,9 +482,22 @@
                             nama_pelatihan:  res.nama_pelatihan  || '-',
                             tahun:           res.tahun           || new Date().getFullYear()
                         };
-                        $('#resultNipPenyelenggaraan').html('<span class="text-success font-weight-bold">Data ditemukan: ' + res.nama_peserta + '</span>');
-                        $('#btnLanjutPenyelenggaraan').removeClass('d-none');
-                        $('#btnCekNipPenyelenggaraan').addClass('d-none');
+                        
+                        // Isi modal konfirmasi
+                        $('#konfNip').text(dataPesertaEP.nip_peserta);
+                        $('#konfNama').text(dataPesertaEP.nama_peserta);
+                        $('#konfJabatan').text(dataPesertaEP.jabatan);
+                        $('#konfInstansi').text(dataPesertaEP.instansi);
+                        $('#konfPelatihan').text(dataPesertaEP.nama_pelatihan);
+                        $('#konfTahun').text(dataPesertaEP.tahun);
+                        
+                        // Sesuaikan teks dan tombol untuk Evaluasi Penyelenggaraan
+                        $('#teksKonfirmasi').text('Berikut adalah data Anda, jika sudah benar silakan bisa melanjutkan ke form Evaluasi Penyelenggaraan');
+                        $('#btnLanjutEvaluasi').data('tipe', 'ep').text('LANJUTKAN EVALUASI PENYELENGGARAAN');
+                        
+                        // Tutup modal NIP, buka modal konfirmasi
+                        $('#modalNipPenyelenggaraan').modal('hide');
+                        $('#modalKonfirmasi').modal('show');
                     } else {
                         $('#resultNipPenyelenggaraan').html('<span class="text-danger">Data NIP tidak ditemukan.</span>');
                     }
@@ -483,9 +514,19 @@
                         nama_pelatihan:  'Pelatihan (Dummy)',
                         tahun:           new Date().getFullYear()
                     };
-                    $('#resultNipPenyelenggaraan').html('<span class="text-warning">(Localhost) Database eksternal tidak tersedia.</span>');
-                    $('#btnLanjutPenyelenggaraan').removeClass('d-none');
-                    $('#btnCekNipPenyelenggaraan').addClass('d-none');
+                    
+                    // Supaya localhost/error juga menampilkan modal konfirmasi
+                    $('#konfNip').text(dataPesertaEP.nip_peserta);
+                    $('#konfNama').text(dataPesertaEP.nama_peserta);
+                    $('#konfJabatan').text(dataPesertaEP.jabatan);
+                    $('#konfInstansi').text(dataPesertaEP.instansi);
+                    $('#konfPelatihan').text(dataPesertaEP.nama_pelatihan);
+                    $('#konfTahun').text(dataPesertaEP.tahun);
+                    $('#teksKonfirmasi').text('Berikut adalah data Anda, jika sudah benar silakan bisa melanjutkan ke form Evaluasi Penyelenggaraan');
+                    $('#btnLanjutEvaluasi').data('tipe', 'ep').text('LANJUTKAN EVALUASI PENYELENGGARAAN');
+                    
+                    $('#modalNipPenyelenggaraan').modal('hide');
+                    $('#modalKonfirmasi').modal('show');
                 }
             });
         });
