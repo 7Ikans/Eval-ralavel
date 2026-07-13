@@ -7,12 +7,12 @@
     <style>
         body { background:#f1f4f7; font-family:"Montserrat",sans-serif; }
         .success-card { max-width:560px; margin:80px auto; text-align:center; padding:40px 32px; }
-        .checkmark { font-size:72px; color:#2d6a4f; margin-bottom:16px; }
+        .checkmark { font-size:72px; color:#FED136; margin-bottom:16px; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark" style="background-color:#2d6a4f;">
-    <a class="navbar-brand" href="#">EVALUASI PENYELENGGARAAN PELATIHAN</a>
+<nav class="navbar navbar-dark" style="background-color:#222222;">
+    <a class="navbar-brand" href="#" style="color:#FED136;">EVALUASI PENYELENGGARAAN PELATIHAN</a>
 </nav>
 
 <div class="card success-card shadow-sm">
@@ -20,7 +20,7 @@
     <h2>Evaluasi Berhasil Disimpan</h2>
     <p class="text-muted">{{ session('nama_diklat') }}</p>
     <p>Terima kasih atas partisipasi Anda dalam mengisi evaluasi penyelenggaraan pelatihan.</p>
-    <a href="{{ route('evaluasi-penyelenggaraan.create') }}" class="btn btn-success">Isi Evaluasi Lain</a>
+    <a href="{{ route('evaluasi-penyelenggaraan.create') }}" class="btn btn-success" style="background-color:#FED136;border-color:#FED136;color:#222;">Kembali</a>
 </div>
 </body>
 </html>

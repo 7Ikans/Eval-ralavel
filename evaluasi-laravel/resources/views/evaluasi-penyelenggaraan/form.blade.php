@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         body { background-color:#f4f7f6; font-family:'Montserrat',sans-serif; font-size:14px; color:#444; }
-        .top-header { background-color:#28a745; color:white; padding:16px 24px; font-size:20px; letter-spacing:0.5px; }
+        .top-header { background-color:#222222; color:#FED136; padding:16px 24px; font-size:20px; letter-spacing:0.5px; }
         .card-custom { border:1px solid #e3e6f0; border-radius:4px; box-shadow:0 2px 4px rgba(0,0,0,0.04); margin-bottom:24px; background:#fff; }
         .data-row { padding:14px 24px; border-bottom:1px solid #f0f0f0; display:flex; }
         .data-row:last-child { border-bottom:none; }
@@ -25,8 +25,6 @@
         .table-kuesioner th { border-bottom:2px solid #eee; font-weight:700; color:#555; font-size:13px; padding:10px; }
         .table-kuesioner td { padding:12px 10px; vertical-align:middle; border-bottom:1px solid #f2f2f2; }
         .table-kuesioner tbody tr:last-child td { border-bottom:none; }
-
-        /* PILIH JENIS KELAS */
         .jenis-card-wrap { display:flex; gap:16px; padding:20px; }
         .jenis-card {
             flex:1; border:2px solid #dee2e6; border-radius:10px; padding:24px 16px;
@@ -46,7 +44,6 @@
         .badge-klasikal { background:#e6f9ed; color:#28a745; }
         .badge-virtual  { background:#e8f0fe; color:#1a73e8; }
 
-        /* SLIDER */
         .slider-container { width:100%; padding:2px 0; }
         .slider-kuesioner {
             -webkit-appearance:none; width:100%; height:6px;
@@ -116,6 +113,7 @@
 
         <form method="POST" action="{{ route('evaluasi-penyelenggaraan.store') }}" id="form-eval-ep">
             @csrf
+            <input type="hidden" name="id_diklat_daftar_online" value="{{ $peserta['id_diklat_daftar_online'] ?? '' }}">
             <input type="hidden" name="nip_peserta"    value="{{ $peserta['nip_peserta'] ?? '' }}">
             <input type="hidden" name="nama_peserta"   value="{{ $peserta['nama_peserta'] ?? '' }}">
             <input type="hidden" name="jabatan"        value="{{ $peserta['jabatan'] ?? '' }}">
@@ -434,6 +432,8 @@
                 $('html, body').animate({ scrollTop: 0 }, 400);
                 return false;
             }
+
+            $('#btnSubmit').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...');
         });
     });
 </script>
