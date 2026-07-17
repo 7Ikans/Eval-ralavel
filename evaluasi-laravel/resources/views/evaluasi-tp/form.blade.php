@@ -16,10 +16,9 @@
             color: #444;
         }
 
-        /* ---- HEADER & KARTU DATA ---- */
         .top-header {
-            background-color: #28a745;
-            color: white;
+            background-color: #222222;
+            color: #FED136;
             padding: 16px 24px;
             font-size: 20px;
             letter-spacing: 0.5px;
@@ -56,7 +55,6 @@
             width: 75%;
         }
 
-        /* ---- KOTAK PERHATIAN ---- */
         .warning-box {
             background-color: #fff3cd;
             border-radius: 4px;
@@ -134,7 +132,6 @@
             margin-bottom: 0;
         }
 
-        /* ---- FORM PENGANTAR ---- */
         .form-header-title {
             font-size: 13px;
             color: #777;
@@ -165,7 +162,6 @@
             object-fit: cover;
         }
 
-        /* ---- TOMBOL ---- */
         .btn-submit-custom {
             background-color: #ffc107;
             color: #222;
@@ -196,7 +192,6 @@
             color: #fff;
         }
 
-        /* ---- TABEL KUESIONER ---- */
         .table-kuesioner {
             width: 100%;
             color: #444;
@@ -230,7 +225,6 @@
             border-bottom: 1px solid #f2f2f2;
         }
 
-        /* ---- STYLING SLIDER KUESIONER ---- */
         .slider-container {
             width: 100% !important;
             min-width: 100%;
@@ -336,9 +330,18 @@
 
         <div id="wrapperForm" style="display: none;">
 
-            @if ($errors->any() || session('error'))
+            @if ($errors->any())
             <div class="alert alert-danger mb-4">
-                <strong>Mohon lengkapi semua pertanyaan wajib sebelum submit.</strong>
+                <strong>Gagal Submit! Ada data yang tidak valid:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @elseif (session('error'))
+            <div class="alert alert-danger mb-4">
+                <strong>{{ session('error') }}</strong>
             </div>
             @endif
 
@@ -348,12 +351,12 @@
                 <input type="hidden" name="nip_peserta" value="{{ $peserta['nip_peserta'] ?? '' }}">
                 <input type="hidden" name="nama_peserta" value="{{ $peserta['nama_peserta'] ?? '' }}">
                 <input type="hidden" name="namadiklat" value="{{ $peserta['nama_pelatihan'] ?? '' }}">
-                <input type="hidden" name="id_diklat_daftar_online" value="1">
+                <input type="hidden" name="id_diklat_daftar_online" value="{{ $peserta['id_diklat_daftar_online'] ?? '' }}">
                 <input type="hidden" name="jenisdiklat" value="-">
                 <input type="hidden" name="tahun" value="{{ date('Y') }}">
-                <input type="hidden" name="nipwi"   id="hidden_nip_wi"  value="">
-                <input type="hidden" name="namawi"  id="hidden_nama_wi" value="">
-                <input type="hidden" name="materi"  id="hidden_materi"  value="">
+                <input type="hidden" name="nipwi" id="hidden_nip_wi" value="">
+                <input type="hidden" name="namawi" id="hidden_nama_wi" value="">
+                <input type="hidden" name="materi" id="hidden_materi" value="">
 
                 <div class="card-custom p-4 mt-4">
 
@@ -365,11 +368,9 @@
 
                             <div class="form-header-title">Materi</div>
                             <select id="select-materi" class="form-control" style="font-size: 14px; color: #555; padding: 8px 12px; height: auto;" required>
-                                <option value="">-- Pilih Materi --</option>
+                                <option value="">Pilih Materi</option>
                                 @if(isset($materi))
                                 @foreach($materi as $m)
-                                {{-- value = id_materi (untuk query WI via AJAX) --}}
-                                {{-- data-nama = nama_materi (yang akan disimpan ke DB) --}}
                                 <option value="{{ $m->id_materi }}" data-nama="{{ $m->nama_materi }}">{{ $m->nama_materi }}</option>
                                 @endforeach
                                 @endif
@@ -382,7 +383,7 @@
                                 <img id="foto_wi" src="https://ui-avatars.com/api/?name=Pilih+Pengajar&background=random" alt="Avatar">
                                 <div style="flex-grow: 1;">
                                     <select id="select-widyaiswara" class="form-control" style="font-size: 14px; color: #333; padding: 6px 10px; height: auto; border: 1px solid #ccc; font-weight: 600;" required>
-                                        <option value="">-- Pilih Materi Terlebih Dahulu --</option>
+                                        <option value="">Pilih Materi Terlebih Dahulu</option>
                                     </select>
                                     <div style="font-size: 12px; color: #888; margin-top: 4px; padding-left: 4px;">Mengajar</div>
                                 </div>
@@ -478,7 +479,7 @@
                     </div>
 
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-block btn-submit-custom mb-2">
+                        <button type="submit" id="btnSubmitEvaluasi" class="btn btn-block btn-submit-custom mb-2">
                             <i class="far fa-paper-plane mr-1"></i> Submit
                         </button>
                         <a href="{{ url('/') }}" class="btn btn-block btn-cancel-custom">
@@ -509,19 +510,14 @@
             $('#wrapperForm').show();
             @endif
 
-            // 1. AJAX saat Materi dipilih
             $('#select-materi').change(function() {
-                var idMateri   = $(this).val();
-                var namaMateri = $(this).find(':selected').data('nama'); 
-
+                var idMateri = $(this).val();
+                var namaMateri = $(this).find(':selected').data('nama');
                 $('#hidden_materi').val(namaMateri);
                 $('#hidden_nama_wi').val('');
                 $('#hidden_nip_wi').val('');
-                
                 var $selectWi = $('#select-widyaiswara');
-                
-                // Kosongkan dropdown pengajar dan beri teks loading
-                $selectWi.empty().append('<option value="">-- Mencari data... --</option>');
+                $selectWi.empty().append('<option value="">Mencari data...</option>');
 
                 if (idMateri !== '') {
                     $.ajax({
@@ -533,55 +529,43 @@
                         },
                         success: function(response) {
                             if (response.status === 'success' && response.data.length > 0) {
-                                // Kosongkan kembali lalu isi dengan daftar pengajar
-                                $selectWi.empty().append('<option value="">-- Pilih Pengajar --</option>');
-                                
-                                // Looping data array pengajar dari controller
+                                $selectWi.empty().append('<option value="">Pilih Pengajar</option>');
                                 $.each(response.data, function(index, wi) {
                                     $selectWi.append('<option value="' + wi.nip_wi + '" data-nama="' + wi.nama_wi + '">' + wi.nama_wi + '</option>');
                                 });
                             } else {
-                                $selectWi.empty().append('<option value="">-- Data pengajar tidak ditemukan --</option>');
+                                $selectWi.empty().append('<option value="">Data pengajar tidak ditemukan</option>');
                             }
                         },
                         error: function() {
-                            $selectWi.empty().append('<option value="">-- Terjadi kesalahan sistem --</option>');
+                            $selectWi.empty().append('<option value="">Terjadi kesalahan sistem</option>');
                         }
                     });
                 } else {
-                    $selectWi.empty().append('<option value="">-- Pilih Materi Terlebih Dahulu --</option>');
+                    $selectWi.empty().append('<option value="">Pilih Materi Terlebih Dahulu</option>');
                 }
             });
 
-            // 2. Logika saat Pengajar dipilih dari dropdown
             $('#select-widyaiswara').change(function() {
                 var nipWi = $(this).val();
                 var $selected = $(this).find(':selected');
                 var namaWi = $selected.data('nama');
                 var fotoWi = $selected.data('foto');
-                
                 var $fotoImg = $('#foto_wi');
-                
-                if(namaWi) {
+
+                if (namaWi) {
                     if (fotoWi && fotoWi !== '') {
-                        // Jika ada nama file di database, coba load gambarnya
                         var imageUrl = '{{ asset("img/foto_wi/") }}/' + fotoWi;
-                        
-                        // Hapus handler error lama, pasang yang baru
                         $fotoImg.off('error').on('error', function() {
-                            // Jika gambar fisik tidak ada di folder, ganti jadi inisial
                             $(this).attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(namaWi) + '&background=random');
                         }).attr('src', imageUrl);
-                        
                     } else {
-                        // Jika tidak ada data foto di database, langsung pakai inisial
                         $fotoImg.off('error').attr('src', 'https://ui-avatars.com/api/?name=' + encodeURIComponent(namaWi) + '&background=random');
                     }
                 } else {
                     $fotoImg.off('error').attr('src', 'https://ui-avatars.com/api/?name=Pilih+Pengajar&background=random');
                 }
-                
-                // Simpan ke input hidden agar ikut tersubmit ke database
+
                 $('#hidden_nip_wi').val(nipWi);
                 $('#hidden_nama_wi').val(namaWi);
             });
@@ -606,7 +590,47 @@
         });
 
         $('.slider-kuesioner').trigger('input');
+
+        $('form').on('submit', function() {
+            $('#btnSubmitEvaluasi').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...');
+        });
     </script>
+
+    @if(session('warning') || session('error'))
+    <div class="modal fade" id="modalAlertSession" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="border-radius: 4px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.2);">
+                <div class="modal-header" id="alertModalHeader" style="border-bottom: 1px solid #eee; padding: 20px 25px; background-color: #fff3cd; border-top-left-radius: 4px; border-top-right-radius: 4px;">
+                    <h5 class="modal-title font-weight-bold" id="alertModalTitle" style="font-family: 'Montserrat', sans-serif; font-size: 17px; color: #856404;">
+                        <i class="fa fa-exclamation-triangle" style="margin-right: 8px;"></i> PERHATIAN
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="outline: none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 35px 30px; text-align: center;">
+                    <p style="font-family: 'Droid Serif', serif; font-size: 16px; color: #444; line-height: 1.6; margin-bottom: 0;">
+                        {{ session('warning') ?? session('error') }}
+                    </p>
+                </div>
+                <div class="modal-footer" style="border-top: none; padding: 15px 25px; justify-content: center;">
+                    <button type="button" class="btn btn-secondary font-weight-bold" data-dismiss="modal" style="background-color: #858c93; border: none; padding: 10px 30px; font-family: 'Montserrat', sans-serif; border-radius: 4px; letter-spacing: 1px;">MENGERTI</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            @if(session('error'))
+            $('#alertModalHeader').css('background-color', '#f8d7da');
+            $('#alertModalTitle').css('color', '#721c24').html('<i class="fa fa-times-circle" style="margin-right: 8px;"></i> GAGAL');
+            @endif
+
+            $('#modalAlertSession').modal('show');
+        });
+    </script>
+    @endif
 </body>
 
 </html>

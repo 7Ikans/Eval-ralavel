@@ -516,7 +516,7 @@
                             nama_peserta: res.nama_peserta,
                             jabatan: res.jabatan || '-',
                             instansi: res.instansi || '-',
-                            id_pelatihan: res.id_pelatihan || 1,
+                            id_diklat_daftar_online: res.id_pelatihan || 1,
                             jenis_pelatihan: res.jenis_pelatihan || '-',
                             nama_pelatihan: res.nama_pelatihan || '-',
                             tahun: res.tahun || new Date().getFullYear()
