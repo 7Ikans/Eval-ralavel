@@ -11,17 +11,36 @@
     {{ $nama_pelatihan }} tahun {{ $tahun }}
 </h4>
 
-<div class="card shadow-sm border" style="border-radius: 0.25rem;">
+<ul class="nav nav-tabs mb-4 border-bottom-0" id="evaluasiTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link custom-tab active" id="hasil-tab" data-bs-toggle="tab" data-bs-target="#hasil-pane" type="button" role="tab">Hasil Evaluasi</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link custom-tab" id="laporan-tab" data-bs-toggle="tab" data-bs-target="#laporan-pane" type="button" role="tab">Laporan per Widyaiswara dan Materi</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="evaluasiTabsContent">
+    
+    <!-- ============================================== -->
+    <!-- TAB 1: HASIL EVALUASI (RAW DATA)               -->
+    <!-- ============================================== -->
+    <div class="tab-pane fade show active" id="hasil-pane" role="tabpanel" tabindex="0">
+        <div class="card shadow-sm border" style="border-radius: 0.25rem;">
     <div class="card-body p-4">
         <div class="table-responsive">
+            <!-- Tambahkan id tabel agar tombol DataTables berfungsi -->
             <table id="tabelDetailEvaluasi" class="table table-bordered table-hover align-middle">
                 <thead class="table-light text-center align-middle" style="font-size: 0.85rem;">
                     <tr>
                         <th rowspan="2" width="5%">#</th>
                         <th rowspan="2" style="min-width: 200px;">Nama Materi</th>
                         <th rowspan="2" style="min-width: 200px;">Nama Tenaga Pengajar / Widyaiswara</th>
-                        <!-- Pastikan colspan sesuai dengan jumlah kolom hasil (14) -->
                         <th colspan="14">Aspek Penilaian</th>
+                        <!-- Penambahan Kolom Baru di Sini -->
+                        <th rowspan="2" style="min-width: 200px;">Saran</th>
+                        <th colspan="2">Evaluator (Peserta)</th>
+                        <th rowspan="2" style="min-width: 150px;">Timestamp</th>
                     </tr>
                     <tr>
                         <th style="min-width: 150px;">Penguasaan materi</th>
@@ -38,6 +57,10 @@
                         <th style="min-width: 180px;">Kecakapan menjaga kondusivitas kelas</th>
                         <th style="min-width: 180px;">Kecakapan menciptakan situasi kelas yang dinamis</th>
                         <th style="min-width: 180px;">Kerjasama antar Widyaiswara</th>
+                        
+                        <!-- Sub-kolom untuk Evaluator -->
+                        <th style="min-width: 180px;">Nama</th>
+                        <th style="min-width: 150px;">NIP</th>
                     </tr>
                 </thead>
                 <tbody style="font-size: 0.9rem;">
@@ -46,7 +69,6 @@
                         <td class="text-center">{{ $no + 1 }}</td>
                         <td>{{ $eval->materi ?? '-' }}</td>
                         <td>{{ $eval->namawi ?? '-' }}</td>
-                        <!-- Menampilkan hasil1 sampai hasil14 -->
                         <td class="text-center">{{ $eval->hasil1 ?? '-' }}</td>
                         <td class="text-center">{{ $eval->hasil2 ?? '-' }}</td>
                         <td class="text-center">{{ $eval->hasil3 ?? '-' }}</td>
@@ -61,11 +83,18 @@
                         <td class="text-center">{{ $eval->hasil12 ?? '-' }}</td>
                         <td class="text-center">{{ $eval->hasil13 ?? '-' }}</td>
                         <td class="text-center">{{ $eval->hasil14 ?? '-' }}</td>
+                        
+                        <!-- Pemanggilan Data Baru -->
+                        <td>{{ $eval->saran ?? '-' }}</td>
+                        <td>{{ $eval->nama_peserta ?? '-' }}</td>
+                        <td class="text-center">{{ $eval->nip_peserta ?? '-' }}</td>
+                        <!-- Menggunakan fallback tglmasuk jika timestamp tidak ditemukan -->
+                        <td class="text-center">{{ $eval->timestamp ?? $eval->tglmasuk ?? '-' }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <!-- colspan diubah menjadi 17 (1 no + 2 info + 14 hasil) -->
-                        <td colspan="17" class="text-center py-4 text-muted">
+                        <!-- Colspan diubah menjadi 21 untuk mengakomodasi seluruh kolom (1+2+14+1+2+1 = 21) -->
+                        <td colspan="21" class="text-center py-4 text-muted">
                             <i class="fa fa-folder-open me-2"></i> Data evaluasi belum tersedia.
                         </td>
                     </tr>
@@ -75,11 +104,148 @@
         </div>
     </div>
 </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: LAPORAN PER WIDYAISWARA (RANGKUMAN)     -->
+    <!-- ============================================== -->
+    <div class="tab-pane fade" id="laporan-pane" role="tabpanel" tabindex="0">
+        
+        @php
+            // Mengelompokkan data berdasarkan Pengajar dan Materi
+            $laporan_widyaiswara = $rincian_evaluasi->groupBy(function($item) {
+                return ($item->namawi ?? 'Anonim') . ' | ' . ($item->materi ?? '-');
+            });
+
+            // Daftar 14 Indikator Penilaian
+            $indikator_list = [
+                'hasil1'  => 'Penguasaan materi',
+                'hasil2'  => 'Sistematika penyajian',
+                'hasil3'  => 'Ketepatan waktu dan kehadiran',
+                'hasil4'  => 'Penggunaan media / sarana pembelajaran',
+                'hasil5'  => 'Penggunaan metode pembelajaran',
+                'hasil6'  => 'Sikap dan perilaku saat mengajar',
+                'hasil7'  => 'Penggunaan bahasa saat mengajar',
+                'hasil8'  => 'Sikap dan perilaku saat bertanya / menjawab / merespon / memberi feedback',
+                'hasil9'  => 'Penggunaan bahasa saat bertanya / menjawab / merespon / memberi feedback',
+                'hasil10' => 'Sikap dan perilaku saat memberi motivasi',
+                'hasil11' => 'Penggunaan bahasa saat memberi motivasi',
+                'hasil12' => 'Kecakapan menjaga kondusivitas kelas',
+                'hasil13' => 'Kecakapan menciptakan situasi kelas yang dinamis',
+                'hasil14' => 'Kerjasama antar Widyaiswara'
+            ];
+        @endphp
+
+        <h4 class="fw-light text-secondary mb-4 mt-3">Laporan Capaian Mutu per Widyaiswara dan Materi</h4>
+
+        @forelse($laporan_widyaiswara as $pengajar_materi => $data_pengajar)
+            <div class="card shadow-sm border mb-5" style="border-radius: 0.25rem;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-uppercase mb-3" style="font-size: 0.95rem;">{{ $pengajar_materi }}</h6>
+                    <button class="btn btn-success btn-sm mb-3">
+                        <i class="fa fa-file-excel me-1"></i> Export to xlsx
+                    </button>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle mb-0">
+                            <thead class="text-center align-middle" style="font-size: 0.85rem;">
+                                <tr>
+                                    <th width="5%" class="bg-light">#</th>
+                                    <th class="bg-light">Indikator</th>
+                                    <th width="10%" class="bg-light">Jumlah Responden</th>
+                                    <th width="8%" style="background-color: #7CFC00;">Sangat Baik</th>
+                                    <th width="8%" style="background-color: #ADFF2F;">Baik</th>
+                                    <th width="8%" style="background-color: #9ACD32;">Cukup Baik</th>
+                                    <th width="8%" style="background-color: #FF7F50; color: white;">Kurang Baik</th>
+                                    <th width="8%" style="background-color: #FF4500; color: white;">Tidak Baik</th>
+                                    <th width="5%" class="bg-light">CN</th>
+                                    <th width="5%" class="bg-light">CM</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-size: 0.9rem;">
+                                @php $no = 1; @endphp
+                                @foreach($indikator_list as $field => $label)
+                                    @php
+                                        // Menghitung jumlah masing-masing jawaban untuk indikator ini
+                                        $sb = $data_pengajar->where($field, 'Sangat Baik')->count();
+                                        $b  = $data_pengajar->where($field, 'Baik')->count();
+                                        $cb = $data_pengajar->where($field, 'Cukup Baik')->count();
+                                        $kb = $data_pengajar->where($field, 'Kurang Baik')->count();
+                                        $tb = $data_pengajar->where($field, 'Tidak Baik')->count();
+                                        
+                                        $total_responden = $sb + $b + $cb + $kb + $tb;
+                                        
+                                        // Menghitung Capaian Mutu (CM) dan Capaian Nilai (CN)
+                                        $cm = 0;
+                                        $cn = 0;
+                                        if($total_responden > 0) {
+                                            $total_score = ($sb * 4) + ($b * 3) + ($cb * 2) + ($kb * 1) + ($tb * 0);
+                                            $cm = $total_score / $total_responden;
+                                            $cn = $cm * 25;
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td class="text-center">{{ $no++ }}</td>
+                                        <td>{{ $label }}</td>
+                                        <td class="text-center">{{ $total_responden }}</td>
+                                        <td class="text-center">{{ $sb }}</td>
+                                        <td class="text-center">{{ $b }}</td>
+                                        <td class="text-center">{{ $cb }}</td>
+                                        <td class="text-center">{{ $kb }}</td>
+                                        <td class="text-center">{{ $tb }}</td>
+                                        <td class="text-center">{{ number_format($cn, 2) }}</td>
+                                        <td class="text-center">{{ number_format($cm, 2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="alert alert-secondary">Data evaluasi belum tersedia untuk direkapitulasi.</div>
+        @endforelse
+    </div>
+</div>
 
 @push('styles')
 <!-- DataTables & Buttons Bootstrap 5 CSS -->
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+
+<style>
+    /* CSS untuk tombol ekspor DataTables (tetap dipertahankan) */
+    div.dt-buttons .dt-button {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin-right: 0.5rem !important;
+    }
+    div.dt-buttons {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    /* === CSS BARU UNTUK NAVIGASI TAB === */
+    .custom-tab {
+        color: #6c757d; /* Warna teks abu-abu saat tidak aktif (text-muted) */
+        font-weight: 500;
+        border: none !important;
+        border-bottom: 3px solid transparent !important;
+        background: transparent !important;
+        padding: 0.5rem 1rem;
+    }
+    .custom-tab:hover {
+        color: #495057;
+        border-color: transparent !important;
+    }
+    /* Gaya visual saat tab memiliki class 'active' */
+    .custom-tab.active {
+        color: #212529 !important; /* Warna teks gelap (text-dark) */
+        border-bottom: 3px solid #0d6efd !important; /* Garis bawah biru (border-primary) */
+    }
+</style>
 @endpush
 
 @push('scripts')
