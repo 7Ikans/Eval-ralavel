@@ -14,7 +14,7 @@
 <div class="card shadow-sm border" style="border-radius: 0.25rem;">
     <div class="card-body p-4">
         <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
+            <table id="tabelDetailEvaluasi" class="table table-bordered table-hover align-middle">
                 <thead class="table-light text-center align-middle" style="font-size: 0.85rem;">
                     <tr>
                         <th rowspan="2" width="5%">#</th>
@@ -75,4 +75,99 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<!-- DataTables & Buttons Bootstrap 5 CSS -->
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+@endpush
+
+@push('scripts')
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<!-- DataTables Core -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<!-- DataTables Buttons -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<!-- JSZip (Untuk Excel) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- pdfmake (Untuk PDF) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<!-- HTML5 Buttons & Print -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<!-- Skrip Inisialisasi DataTables -->
+<script>
+    $(document).ready(function() {
+        $('#tabelDetailEvaluasi').DataTable({
+            // dom: mengatur letak (B = Buttons, f = filter, tr = tabel, i = info, p = pagination)
+            dom: "<'row'<'col-sm-12 col-md-8'B><'col-sm-12 col-md-4'f>>" +
+                 "<'row'<'col-sm-12'tr>>" +
+                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: [
+                { 
+                    extend: 'copy', 
+                    className: 'btn btn-secondary btn-sm',
+                    text: '<i class="fa fa-copy me-1"></i> Copy'
+                },
+                { 
+                    extend: 'csv', 
+                    className: 'btn btn-info btn-sm text-white',
+                    text: '<i class="fa fa-file-csv me-1"></i> CSV'
+                },
+                { 
+                    extend: 'excel', 
+                    className: 'btn btn-success btn-sm',
+                    text: '<i class="fa fa-file-excel me-1"></i> Excel'
+                },
+                { 
+                    extend: 'pdf', 
+                    className: 'btn btn-danger btn-sm',
+                    text: '<i class="fa fa-file-pdf me-1"></i> PDF',
+                    orientation: 'landscape', 
+                    pageSize: 'LEGAL' 
+                },
+                { 
+                    extend: 'print', 
+                    className: 'btn btn-primary btn-sm',
+                    text: '<i class="fa fa-print me-1"></i> Print'
+                }
+            ],
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json"
+            },
+            scrollX: true 
+        });
+    });
+</script>
+@endpush
+
+@push('styles')
+<!-- DataTables & Buttons Bootstrap 5 CSS -->
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+
+<!-- Tambahkan style kustom ini -->
+<style>
+    /* Menghilangkan background bawaan DataTables dan memberi jarak antar tombol */
+    div.dt-buttons .dt-button {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin-right: 0.5rem !important; /* Jarak antar tombol */
+    }
+    
+    /* Memastikan tata letak tombol rapi di layar kecil */
+    div.dt-buttons {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+    }
+</style>
+@endpush
+
 @endsection
