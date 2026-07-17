@@ -24,7 +24,7 @@
                 <thead class="table-light">
                     <tr>
                         <th width="5%" class="text-center">#</th>
-                        <th width="25%">Jenis Pelatihan</th>
+                        <th width="12%">Jenis Pelatihan</th> 
                         <th>Nama Pelatihan</th>
                         <th width="15%" class="text-center">Tahun</th>
                     </tr>
@@ -35,7 +35,7 @@
                         <td class="text-center">{{ $no + 1 }}</td>
                         <td>{{ $row->jenispelatihan }}</td>
                         <td>
-                            <a href="../tp/hasilevaltp_2024.php?iddiklat_daftar_online={{ $row->id_diklat_daftar_online }}&ndiklat={{ urlencode($row->namapelatihan) }}&thn={{ $row->tahun }}" target="_blank" class="text-decoration-none">
+                            <a href="{{ route('admin.evaluasi.detail', ['tahun' => $row->tahun, 'id_diklat' => $row->id_diklat_daftar_online, 'ndiklat' => $row->namapelatihan]) }}" target="_blank" class="text-decoration-none fw-medium text-primary">
                                 {{ $row->namapelatihan }}
                             </a>
                         </td>

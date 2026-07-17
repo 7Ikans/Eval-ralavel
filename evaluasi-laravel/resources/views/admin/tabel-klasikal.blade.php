@@ -36,7 +36,10 @@
                 <tr>
                     <td>{{ $row->jenis_diklat }}</td>
                     <td>
-                        {{ $row->nama_diklat }}
+                        <!-- Menambahkan tautan langsung pada Nama Pelatihan -->
+                        <a href="/tp/hasilevaltp_{{ $tahun }}.php?iddiklat_daftar_online={{ $row->id_diklat_daftar_online ?? $row->id }}&ndiklat={{ urlencode($row->nama_diklat) }}&thn={{ $tahun }}" target="_blank" class="text-decoration-none fw-medium">
+                            {{ $row->nama_diklat }}
+                        </a>
                         <br><small class="text-muted fst-italic">{{ $row->jmlh }} Peserta</small>
                     </td>
 
@@ -47,7 +50,10 @@
                         @endif
                     </td>
                     <td class="text-center text-nowrap">
-                        <a href="#" class="text-primary me-2" title="Lihat"><i class="fa fa-eye"></i></a>
+                        <!-- Memperbarui atribut href pada tombol Lihat (ikon mata) -->
+                        <a href="/tp/hasilevaltp_{{ $tahun }}.php?iddiklat_daftar_online={{ $row->id_diklat_daftar_online ?? $row->id }}&ndiklat={{ urlencode($row->nama_diklat) }}&thn={{ $tahun }}" target="_blank" class="text-primary me-2" title="Lihat">
+                            <i class="fa fa-eye"></i>
+                        </a>
                         <a href="#" class="text-secondary" title="Edit"><i class="fa fa-pen-to-square"></i></a>
                     </td>
 
@@ -86,7 +92,15 @@
 @endsection
 
 @push('styles')
-<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet">
+<!-- Contoh perbaikan pada tautan Nama Pelatihan -->
+<a href="{{ route('admin.evaluasi.detail', ['tahun' => $tahun, 'id_diklat' => $row->id_diklat_daftar_online ?? $row->id, 'ndiklat' => $row->nama_diklat]) }}" target="_blank" class="text-decoration-none fw-medium">
+    {{ $row->nama_diklat }}
+</a>
+
+<!-- Contoh perbaikan pada tautan ikon Mata (Lihat) -->
+<a href="{{ route('admin.evaluasi.detail', ['tahun' => $tahun, 'id_diklat' => $row->id_diklat_daftar_online ?? $row->id, 'ndiklat' => $row->nama_diklat]) }}" target="_blank" class="text-primary me-2" title="Lihat">
+    <i class="fa fa-eye"></i>
+</a>
 @endpush
 
 @push('scripts')

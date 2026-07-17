@@ -640,7 +640,7 @@
                 });
             });
 
-            @if($errors - > any() || session('error'))
+            @if($errors -> any() || session('error'))
             $('#cardKetentuan').hide();
             $('#wrapperForm').show();
             initSliders();

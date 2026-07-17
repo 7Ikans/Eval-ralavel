@@ -24,7 +24,7 @@
                 <thead class="table-light">
                     <tr>
                         <th width="5%" class="text-center">#</th>
-                        <th width="25%">Jenis Pelatihan</th>
+                        <th width="12%">Jenis Pelatihan</th> 
                         <th>Nama Pelatihan</th>
                         <th width="15%" class="text-center">Tahun</th>
                     </tr>

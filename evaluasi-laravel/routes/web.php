@@ -39,4 +39,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/tabel-elearning', [AdminController::class, 'tabelElearning'])->name('tabel.elearning');
     Route::get('/tabel-2022', [AdminController::class, 'tabel2022'])->name('tabel2022');
     Route::get('/tabel-2024', [AdminController::class, 'tabel2024'])->name('tabel2024');
+    Route::get('/evaluasi-tp/detail/{tahun}/{id_diklat}', [AdminController::class, 'detailEvaluasi'])->name('evaluasi.detail');
 });
